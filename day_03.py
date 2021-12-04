@@ -24,11 +24,10 @@ def rating(inputfile: str, invert=False) -> int:
         mask = data[:, column] == (data[:, column].sum() >= data.shape[0]/2)
         if invert:
             mask = np.invert(mask)
-        data = data[mask, :]
+        data = data[mask]
         column += 1
     assert data.shape[0] == 1, "This puzzle has no unique solution."
     return bin_to_int(data.squeeze(axis=0))
-    pass
 
 
 def ratings(inputfile: str):

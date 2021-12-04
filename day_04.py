@@ -28,9 +28,9 @@ def bingo(input_file: str):
         now_winning = np.any(np.bitwise_or(marked.sum(axis=2) == board_size,
                                            marked.sum(axis=1) == board_size), axis=1)
         winning_in_this_round = np.bitwise_xor(winning, now_winning)
-        if np.any(winning_in_this_round) and winning.sum() == 0:
+        if np.any(winning_in_this_round) and np.all(~winning):
             print(f"First winning score: {get_score(winning_in_this_round, boards, marked, n)}")
-        if np.any(winning_in_this_round) and now_winning.sum() == boards.shape[0]:
+        if np.any(winning_in_this_round) and np.all(now_winning):
             print(f"Last winning score: {get_score(winning_in_this_round, boards, marked, n)}")
             break
         winning = now_winning
