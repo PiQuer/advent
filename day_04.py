@@ -14,25 +14,26 @@ def get_data(input_file: str):
     return numbers, boards
 
 
-def get_winning_board(mask):
-    return np.argwhere(np.bitwise_or(mask.sum(axis=2) == board_size, mask.sum(axis=1) == board_size))
+def get_score(boards_to_consider, boards, marked, n):
+    assert boards_to_consider.sum() == 1, "Ambiguous solution."
+    return boards[boards_to_consider][~marked[boards_to_consider]].sum() * n
 
 
 def bingo(input_file: str):
     numbers, boards = get_data(input_file)
-    mask = np.zeros_like(boards, dtype=bool)
-    n = 0
-    winning = None
+    marked = np.zeros_like(boards, dtype=bool)
+    winning = np.zeros(boards.shape[0], dtype=bool)
     for n in numbers:
-        mask = np.bitwise_or(mask, boards == n)
-        winning = get_winning_board(mask)
-        if winning.size > 0:
+        marked = np.bitwise_or(marked, boards == n)
+        now_winning = np.any(np.bitwise_or(marked.sum(axis=2) == board_size,
+                                           marked.sum(axis=1) == board_size), axis=1)
+        winning_in_this_round = np.bitwise_xor(winning, now_winning)
+        if np.any(winning_in_this_round) and winning.sum() == 0:
+            print(f"First winning score: {get_score(winning_in_this_round, boards, marked, n)}")
+        if np.any(winning_in_this_round) and now_winning.sum() == boards.shape[0]:
+            print(f"Last winning score: {get_score(winning_in_this_round, boards, marked, n)}")
             break
-    assert winning is not None, "No winner was found."
-    assert winning.shape[0] == 1, "Multiple winners were found."
-    winning_board = winning[0, 0]
-    result = boards[winning_board][~mask[winning_board]].sum() * n
-    print(f"Score: {result}")
+        winning = now_winning
 
 
 if __name__ == '__main__':
