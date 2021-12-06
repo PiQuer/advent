@@ -24,10 +24,9 @@ def bingo(input_file: str):
     marked = np.zeros_like(boards, dtype=bool)
     winning = np.zeros(boards.shape[0], dtype=bool)
     for n in numbers:
-        marked = np.bitwise_or(marked, boards == n)
-        now_winning = np.any(np.bitwise_or(marked.sum(axis=2) == board_size,
-                                           marked.sum(axis=1) == board_size), axis=1)
-        winning_in_this_round = np.bitwise_xor(winning, now_winning)
+        marked |= boards == n
+        now_winning = np.any((marked.sum(axis=2) == board_size) | (marked.sum(axis=1) == board_size), axis=1)
+        winning_in_this_round = np.logical_xor(winning, now_winning)
         if np.any(winning_in_this_round) and np.all(~winning):
             print(f"First winning score: {get_score(winning_in_this_round, boards, marked, n)}")
         if np.any(winning_in_this_round) and np.all(now_winning):

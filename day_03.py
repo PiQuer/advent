@@ -13,7 +13,7 @@ def get_data(inputfile):
 def power_consumption(inputfile: str):
     data = get_data(inputfile)
     gamma = np.round(np.sum(data, axis=0) / data.shape[0]).astype(bool)
-    epsilon = np.invert(gamma)
+    epsilon = ~gamma
     print(f"power consumption: {bin_to_int(epsilon) * bin_to_int(gamma)}")
 
 
