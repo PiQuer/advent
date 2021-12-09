@@ -53,5 +53,5 @@ def part_two(input_file: str):
 
 
 if __name__ == '__main__':
-    [part_one(input_file) for input_file in ("input/day_09_example.txt", "input/day_09.txt")]
-    [part_two(input_file) for input_file in ("input/day_09_example.txt", "input/day_09.txt")]
+    funcs, input_files = (part_one, part_two), ("input/day_09_example.txt", "input/day_09.txt")
+    [func(input_file) for func in funcs for input_file in input_files]
