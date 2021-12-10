@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 hightmap_max = 9
 
@@ -40,18 +41,18 @@ def get_basin_size(hightmap, low_point):
     return max_basin(basin_start, hightmap).sum()
 
 
-def part_one(input_file: str):
-    data = get_data(input_file) + 1
-    print(f"The sum of the risk levels is {data[get_low_points(data)].sum()}.")
+@pytest.mark.parametrize("input_file", ["input/day_09_example.txt", "input/day_09.txt"])
+class TestDay09:
+    def test_part_one(self, input_file: str):
+        data = get_data(input_file) + 1
+        result = data[get_low_points(data)].sum()
+        print(f"The sum of the risk levels is {result}.")
+        assert result == (15 if "example" in input_file else 522)
 
-
-def part_two(input_file: str):
-    data = get_data(input_file)
-    low_points = get_low_points(data)
-    basin_sizes = [get_basin_size(data, low_point) for low_point in zip(*np.nonzero(low_points))]
-    print(f"The product of the three largest basin sizes is {np.prod(sorted(basin_sizes)[-3:])}")
-
-
-if __name__ == '__main__':
-    funcs, input_files = (part_one, part_two), ("input/day_09_example.txt", "input/day_09.txt")
-    [func(input_file) for func in funcs for input_file in input_files]
+    def test_part_two(self, input_file: str):
+        data = get_data(input_file)
+        low_points = get_low_points(data)
+        basin_sizes = [get_basin_size(data, low_point) for low_point in zip(*np.nonzero(low_points))]
+        result = np.prod(sorted(basin_sizes)[-3:])
+        print(f"The product of the three largest basin sizes is {result}")
+        assert result == (1134 if "example" in input_file else 916688)
