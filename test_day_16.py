@@ -1,10 +1,11 @@
-import pytest
+from pytest_cases import parametrize_with_cases, parametrize
 from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Tuple, Union
 from bitarray import bitarray
 import bitarray.util as ba_util
+import numpy as np
 
 
 class TypeID(Enum):
@@ -34,9 +35,12 @@ class LiteralPacket(Packet):
     content: int
 
 
-def get_data(input_file) -> bitarray:
+def get_packet(input_file) -> Packet:
     hex_string = Path(input_file).read_text()
-    return ba_util.int2ba(int(hex_string, 16), length=4*len(hex_string))
+    bits = ba_util.int2ba(int(hex_string, 16), length=4*len(hex_string))
+    packet, rest = parse_packet(bits)
+    assert len(rest) == 0 or ba_util.ba2int(rest) == 0
+    return packet
 
 
 def parse_literal(bits: bitarray) -> Tuple[int, bitarray]:
@@ -88,18 +92,55 @@ def sum_version(packet: Union[Packet, LiteralPacket, OperatorPacket]):
         return packet.version + sum(sum_version(p) for p in packet.sub_packets)
 
 
-@pytest.mark.parametrize("input_file,expected",
-                         (("input/day_16_example_01.txt", 6),
-                          ("input/day_16_example_02.txt", 9),
-                          ("input/day_16_example_03.txt", 14),
-                          ("input/day_16_example_04.txt", 16),
-                          ("input/day_16_example_05.txt", 12),
-                          ("input/day_16_example_06.txt", 23),
-                          ("input/day_16_example_07.txt", 31),
-                          ("input/day_16.txt", 969)))
-def test_day_16(input_file, expected):
-    bits = get_data(input_file)
-    packet, rest = parse_packet(bits)
-    assert ba_util.ba2int(rest) == 0
-    result = sum_version(packet)
+def process(packet: Union[Packet, LiteralPacket, OperatorPacket]):
+    if packet.type_id == TypeID.LITERAL:
+        return packet.content
+    sub = list(process(p) for p in packet.sub_packets)
+    if packet.type_id == TypeID.OPERATOR_SUM:
+        return np.sum(sub)
+    if packet.type_id == TypeID.OPERATOR_PROD:
+        return np.prod(sub)
+    if packet.type_id == TypeID.OPERATOR_MIN:
+        return np.min(sub)
+    if packet.type_id == TypeID.OPERATOR_MAX:
+        return np.max(sub)
+    if packet.type_id == TypeID.OPERATOR_GT:
+        return int(sub[0] > sub[1])
+    if packet.type_id == TypeID.OPERATOR_LT:
+        return int(sub[0] < sub[1])
+    if packet.type_id == TypeID.OPERATOR_EQ:
+        return int(sub[0] == sub[1])
+
+
+@parametrize("input_file,expected",
+             (("input/day_16_example_01.txt", 6),
+              ("input/day_16_example_02.txt", 9),
+              ("input/day_16_example_03.txt", 14),
+              ("input/day_16_example_04.txt", 16),
+              ("input/day_16_example_05.txt", 12),
+              ("input/day_16_example_06.txt", 23),
+              ("input/day_16_example_07.txt", 31),
+              ("input/day_16.txt", 969)))
+def case_part_one(input_file, expected):
+    packet = get_packet(input_file)
+    return sum_version(packet), expected
+
+
+@parametrize("input_file,expected",
+             (("input/day_16_example_08.txt", 3),
+              ("input/day_16_example_09.txt", 54),
+              ("input/day_16_example_10.txt", 7),
+              ("input/day_16_example_11.txt", 9),
+              ("input/day_16_example_12.txt", 1),
+              ("input/day_16_example_13.txt", 0),
+              ("input/day_16_example_14.txt", 0),
+              ("input/day_16_example_15.txt", 1),
+              ("input/day_16.txt", 124921618408)))
+def case_part_two(input_file, expected):
+    packet = get_packet(input_file)
+    return process(packet), expected
+
+
+@parametrize_with_cases("result,expected", cases=".")
+def test_day_16(result, expected):
     assert result == expected
