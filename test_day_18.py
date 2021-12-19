@@ -1,5 +1,6 @@
 import pytest
 import copy
+import itertools
 from typing import Union, Optional
 from dataclasses import dataclass
 from pathlib import Path
@@ -160,4 +161,13 @@ def test_reduce(number, reduced):
 def test_part_one(input_file, expected):
     numbers = get_data(input_file)
     result = abs(sum(numbers[1:], start=numbers[0]))
+    assert result == expected
+
+
+@pytest.mark.parametrize("input_file, expected",
+                         (("input/day_18_example.txt", 3993),
+                          ("input/day_18.txt", 4802)))
+def test_part_two(input_file, expected):
+    numbers = get_data(input_file)
+    result = max(abs(pair[0] + pair[1]) for pair in itertools.permutations(numbers, 2))
     assert result == expected
