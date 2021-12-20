@@ -34,21 +34,18 @@ def get_matching_beacon_candidates(distances_0, distances_1):
 def align(reports, distances, index_0, index_1):
     candidates = get_matching_beacon_candidates(distances[index_0], distances[index_1])
     if len(candidates) < math.comb(overlap_threshold, 2):
-        return False
-    for candidate in candidates:
-        x1, x2, y1, y2 = reports[index_0][candidate[0]], reports[index_0][candidate[1]], \
-            reports[index_1][candidate[2]], reports[index_1][candidate[3]]
-        for y1, y2 in ((y1, y2), (y2, y1)):
-            rot = [r for r in rotations if np.array_equal(np.dot(r, (y2 - y1)), x2 - x1)]
-            if rot:
-                break
-        assert len(rot) < 2
-        transformed = np.dot(rot[0], (reports[index_1] - y1).transpose()).transpose() + x1
-        # noinspection PyUnresolvedReferences
-        if (reports[index_0][:, None] == transformed).all(-1).any(-1).sum() >= overlap_threshold:
-            reports[index_1][:] = transformed
-            return True
-    return False
+        for candidate in candidates:
+            x1, x2, y1, y2, r = reports[index_0][candidate[0]], reports[index_0][candidate[1]], \
+                reports[index_1][candidate[2]], reports[index_1][candidate[3]], None
+            for (y1, y2), r in itertools.product(((y1, y2), (y2, y1)), rotations):
+                if np.array_equal(np.dot(r, (y2 - y1)), x2 - x1):
+                    break
+            transformed = np.dot(r, (reports[index_1] - y1).transpose()).transpose() + x1
+            # noinspection PyUnresolvedReferences
+            if (reports[index_0][:, None] == transformed).all(-1).any(-1).sum() >= overlap_threshold:
+                reports[index_1][:] = transformed
+                return True, np.dot(r, -y1) + x1
+    return False, None
 
 
 @pytest.mark.parametrize("input_file,expected",
@@ -57,12 +54,13 @@ def align(reports, distances, index_0, index_1):
 def test_part_one(input_file, expected):
     reports = get_scanner_reports(input_file)
     distances = [get_distances(report) for report in reports]
-    aligned = [0]
+    aligned = [(0, np.array([0, 0, 0], dtype=int))]
     unaligned = list(range(1, len(reports)))
     while unaligned:
         for a, u in itertools.product(aligned, unaligned):
-            if align(reports, distances, a, u):
-                aligned.append(u)
+            is_aligned, scanner_pos = align(reports, distances, a[0], u)
+            if is_aligned:
+                aligned.append((u, scanner_pos))
                 unaligned.remove(u)
                 break
     result = np.unique(np.concatenate(reports), axis=0).shape[0]
