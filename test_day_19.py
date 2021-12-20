@@ -33,7 +33,7 @@ def get_matching_beacon_candidates(distances_0, distances_1):
 
 def align(reports, distances, index_0, index_1):
     candidates = get_matching_beacon_candidates(distances[index_0], distances[index_1])
-    if len(candidates) < math.comb(overlap_threshold, 2):
+    if len(candidates) >= math.comb(overlap_threshold, 2):
         for candidate in candidates:
             x1, x2, y1, y2, r = reports[index_0][candidate[0]], reports[index_0][candidate[1]], \
                 reports[index_1][candidate[2]], reports[index_1][candidate[3]], None
@@ -43,15 +43,16 @@ def align(reports, distances, index_0, index_1):
             transformed = np.dot(r, (reports[index_1] - y1).transpose()).transpose() + x1
             # noinspection PyUnresolvedReferences
             if (reports[index_0][:, None] == transformed).all(-1).any(-1).sum() >= overlap_threshold:
+                scanner_pos = np.dot(r, -y1) + x1
                 reports[index_1][:] = transformed
-                return True, np.dot(r, -y1) + x1
+                return True, scanner_pos
     return False, None
 
 
-@pytest.mark.parametrize("input_file,expected",
-                         (("input/day_19_example.txt", 79),
-                          ("input/day_19.txt", 462)))
-def test_part_one(input_file, expected):
+@pytest.mark.parametrize("input_file,expected_one, expected_two",
+                         (("input/day_19_example.txt", 79, 3621),
+                          ("input/day_19.txt", 462, 12158)))
+def test_part_one(input_file, expected_one, expected_two):
     reports = get_scanner_reports(input_file)
     distances = [get_distances(report) for report in reports]
     aligned = [(0, np.array([0, 0, 0], dtype=int))]
@@ -63,5 +64,7 @@ def test_part_one(input_file, expected):
                 aligned.append((u, scanner_pos))
                 unaligned.remove(u)
                 break
-    result = np.unique(np.concatenate(reports), axis=0).shape[0]
-    assert result == expected
+    result_one = np.unique(np.concatenate(reports), axis=0).shape[0]
+    result_two = max(np.sum(np.abs(p[0][1]-p[1][1])) for p in itertools.combinations(aligned, r=2))
+    assert result_one == expected_one
+    assert result_two == expected_two
