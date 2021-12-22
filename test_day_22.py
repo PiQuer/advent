@@ -12,6 +12,10 @@ class Cuboid:
         else:
             self._borders = ((xmin, xmax), (ymin, ymax), (zmin, zmax))
 
+    @property
+    def borders(self):
+        return self._borders
+
     def __str__(self):
         return str(self._borders)
 
@@ -63,11 +67,31 @@ empty = Cuboid(0, 0, 0, 0, 0, 0)
 class PolyCuboid:
     def __init__(self, cuboids: Optional[set[Cuboid]] = None):
         self._cuboids: set[Cuboid] = cuboids if cuboids is not None else set()
-        self._cuboids.add(empty)
+        self._cuboids -= {empty}
 
     @property
     def cuboid_set(self) -> set[Cuboid]:
         return self._cuboids
+
+    def _defrag(self, candidates: set[Cuboid]) -> set[Cuboid]:
+        optimized = set()
+        for i in candidates:
+            if i not in self._cuboids:
+                continue
+            for j in self._cuboids - candidates:
+                b1, b2 = i.borders, j.borders
+                comb = Cuboid(*sum(((min(b1[dim][0], b2[dim][0]), max(b1[dim][1], b2[dim][1]))
+                                    for dim in (0, 1, 2)), ()))
+                if abs(comb) == abs(i) + abs(j):
+                    self._cuboids -= {i, j}
+                    self._cuboids.add(comb)
+                    optimized.add(comb)
+                    break
+        return optimized
+
+    def defrag(self, candidates: set[Cuboid]):
+        while candidates:
+            candidates = self._defrag(candidates)
 
     def __str__(self):
         return '{ ' + '\n  '.join(str(c) for c in self._cuboids) + ' }'
@@ -91,7 +115,9 @@ class PolyCuboid:
         return PolyCuboid(result)
 
     def __or__(self, other: Cuboid):
-        return PolyCuboid({other} | (self - other)._cuboids)
+        result = PolyCuboid({other} | (self - other)._cuboids)
+        # result.defrag({other})
+        return result
 
     def __and__(self, other: Cuboid):
         result = set()
@@ -118,7 +144,7 @@ def get_data(input_file):
                           ("input/day_22_example_02.txt", 590784, 39769202357779),
                           ("input/day_22_example_03.txt", 474140, 2758514936282235),
                           ("input/day_22.txt", 568000, 1177411289280259)))
-def test_part_one(input_file, expected_part_one, expected_part_two):
+def test_day_22(input_file, expected_part_one, expected_part_two):
     pc = PolyCuboid()
     mask = Cuboid(-50, 51, -50, 51, -50, 51)
     for on_off, cuboid in get_data(input_file):
@@ -128,5 +154,13 @@ def test_part_one(input_file, expected_part_one, expected_part_two):
             pc -= cuboid
     result_part_one = abs(pc & mask)
     result_part_two = abs(pc)
+    print(f"\n{len(pc)}")
     assert result_part_one == expected_part_one
     assert result_part_two == expected_part_two
+
+
+def test_defrag():
+    c1 = Cuboid(0, 3, 0, 3, 0, 3)
+    c2 = Cuboid(1, 2, 1, 2, 1, 2)
+    c3 = (c1 - c2) | c2
+    assert c3 == PolyCuboid({c1})
