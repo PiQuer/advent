@@ -1,19 +1,13 @@
 import numpy as np
 import pytest
 
+from utils import shift
+
 hightmap_max = 9
 
 
 def get_data(input_file: str) -> np.array:
     return np.genfromtxt(input_file, dtype=int, delimiter=1)
-
-
-def shift(array: np.array, amount=1, axis=0, fill=11):
-    result = np.roll(np.copy(array), amount, axis=axis)
-    index = [slice(None) for _ in result.shape]
-    index[axis] = slice(min(np.sign(amount), 0), amount + min(np.sign(amount), 0), np.sign(amount))
-    result[tuple(index)] = fill
-    return result
 
 
 def get_low_points(hightmap):
