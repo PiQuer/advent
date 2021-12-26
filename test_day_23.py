@@ -13,9 +13,33 @@ forbidden = tuple(itertools.product((1,), (c for c in home_columns.values())))
 
 
 def get_data(input_file):
-    lines = Path(input_file).read_text().splitlines()
-    data = np.array([list(line) + [' ']*(len(lines[0])-len(line)) for line in lines])
-    return data
+    result = []
+    boards = Path(input_file).read_text().split('\n\n')
+    for board in boards:
+        lines = board.splitlines()
+        result.append(np.array([list(line) + [' ']*(len(lines[0])-len(line)) for line in lines]))
+    return result
+
+
+def get_data_part_one(input_file):
+    result = get_data(input_file)
+    return result[0] if len(result) == 1 else result
+
+
+def get_data_part_two(input_file):
+    boards = get_data(input_file)
+    unfold = ("  #D#C#B#A#  ", "  #D#B#A#C#  ")
+    result = []
+    for board in boards:
+        if board.shape[0] == 5:
+            new_data = np.zeros_like(board, shape=(board.shape[0]+2, board.shape[1]))
+            new_data[0:3] = board[0:3]
+            new_data[3:5] = np.array([list(line) for line in unfold])
+            new_data[5:] = board[3:]
+        else:
+            new_data = board
+        result.append(new_data)
+    return result[0] if len(result) == 1 else result
 
 
 def visualize(board, mask=None):
@@ -33,11 +57,10 @@ def one_step(start, board: np.array):
 def legal_move(amphipod, board, x0, z0, z1):
     if (z0, z1) in forbidden:
         return False
-    homerun = z1 == home_columns[amphipod] and (z0 == 3 or (z0 == 2 and board[3, z1] == amphipod))
+    homerun = z1 == home_columns[amphipod] and np.all(board[z0+1:-1, z1] == amphipod)
     if x0 == 1:
         return homerun
-    if x0 in (2, 3):
-        return z0 == 1 or homerun
+    return z0 == 1 or homerun
 
 
 def find_next_moves(x0, x1, seen, board, energy):
@@ -68,7 +91,7 @@ def free_amphipods(board):
     amphipods = np.isin(board, ('A', 'B', 'C', 'D')).nonzero()
     index = np.zeros_like(amphipods[0], dtype=bool)
     for i, (ax0, ax1) in enumerate(zip(*amphipods)):
-        if ax0 == 1 or ax1 != home_columns[board[ax0, ax1]] or (ax0 == 2 and board[3, ax1] != board[ax0, ax1]):
+        if ax0 == 1 or ax1 != home_columns[board[ax0, ax1]] or np.any(board[ax0+1:-1, ax1] != board[ax0, ax1]):
             index[i] = True
     return amphipods[0][index], amphipods[1][index]
 
@@ -79,7 +102,7 @@ def to_tuple(board):
 
 def is_winning(board):
     for key, value in home_columns.items():
-        if board[2, value] != key or board[3, value] != key:
+        if np.any(board[2:-1, value] != key):
             return False
     return True
 
@@ -103,13 +126,16 @@ def play(board: np.array):
     return min_energy
 
 
-@pytest.mark.parametrize("input_file,expected",
-                         (("input/day_23_example.txt", 12521),
-                          ("input/day_23.txt", 12530)))
-def test_day_23(input_file, expected):
-    board = get_data(input_file)
+@pytest.mark.parametrize("input_file,get_data_fn,expected",
+                         (("input/day_23_example.txt", get_data_part_one, 12521),
+                          ("input/day_23.txt", get_data_part_one, 12530),
+                          ("input/day_23_example.txt", get_data_part_two, 44169),
+                          ("input/day_23.txt", get_data_part_two, 50492)))
+def test_day_23(input_file, get_data_fn, expected):
+    board = get_data_fn(input_file)
     result = play(board)
     assert result == expected
 
 
-debug = [to_tuple(get_data(f"input/day_23_debug_0{d}.txt")) for d in range(1, 8)]
+debug_part_one = [to_tuple(board) for board in get_data_part_one("input/day_23_debug_01.txt")]
+debug_part_two = [to_tuple(board) for board in get_data_part_two("input/day_23_debug_02.txt")]
