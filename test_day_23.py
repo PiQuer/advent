@@ -54,8 +54,19 @@ def one_step(start, board: np.array):
     return np.logical_and.reduce(np.stack([np.logical_or.reduce(shifted), board == '.', ~start]))
 
 
+def check_blocking(amphipod, board, z1):
+    home1 = home_columns[amphipod]
+    for b in np.isin(board[1], ('A', 'B', 'C', 'D')).nonzero()[0]:
+        home2 = home_columns[board[1, b]]
+        if home1 < b < z1 < home2 or home2 < z1 < b < home1:
+            return True
+    return False
+
+
 def legal_move(amphipod, board, x0, z0, z1):
     if (z0, z1) in forbidden:
+        return False
+    if z0 == 1 and check_blocking(amphipod, board, z1):
         return False
     homerun = z1 == home_columns[amphipod] and np.all(board[z0+1:-1, z1] == amphipod)
     if x0 == 1:
