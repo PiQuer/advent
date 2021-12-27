@@ -73,26 +73,6 @@ class PolyCuboid:
     def cuboid_set(self) -> set[Cuboid]:
         return self._cuboids
 
-    def _defrag(self, candidates: set[Cuboid]) -> set[Cuboid]:
-        optimized = set()
-        for i in candidates:
-            if i not in self._cuboids:
-                continue
-            for j in self._cuboids - candidates:
-                b1, b2 = i.borders, j.borders
-                comb = Cuboid(*sum(((min(b1[dim][0], b2[dim][0]), max(b1[dim][1], b2[dim][1]))
-                                    for dim in (0, 1, 2)), ()))
-                if abs(comb) == abs(i) + abs(j):
-                    self._cuboids -= {i, j}
-                    self._cuboids.add(comb)
-                    optimized.add(comb)
-                    break
-        return optimized
-
-    def defrag(self, candidates: set[Cuboid]):
-        while candidates:
-            candidates = self._defrag(candidates)
-
     def __str__(self):
         return '{ ' + '\n  '.join(str(c) for c in self._cuboids) + ' }'
 
@@ -157,10 +137,3 @@ def test_day_22(input_file, expected_part_one, expected_part_two):
     print(f"\n{len(pc)}")
     assert result_part_one == expected_part_one
     assert result_part_two == expected_part_two
-
-
-def test_defrag():
-    c1 = Cuboid(0, 3, 0, 3, 0, 3)
-    c2 = Cuboid(1, 2, 1, 2, 1, 2)
-    c3 = (c1 - c2) | c2
-    assert c3 == PolyCuboid({c1})
