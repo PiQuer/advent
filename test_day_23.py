@@ -3,6 +3,7 @@ from pathlib import Path
 import numpy as np
 import itertools
 import math
+from collections import defaultdict
 
 from utils import shift
 
@@ -74,7 +75,7 @@ def legal_move(amphipod, board, x0, z0, z1):
     return z0 == 0 or homerun
 
 
-def find_next_moves(x0, x1, seen, board, energy):
+def find_next_moves(x0, x1, new_candidates, board, energy):
     amphipod = board[x0, x1]
     result = []
     steps = 0
@@ -91,9 +92,9 @@ def find_next_moves(x0, x1, seen, board, energy):
                 new_board[x0, x1] = '.'
                 new_board_tuple = to_tuple(new_board)
                 new_energy = energy + steps*energies[amphipod]
-                if new_board_tuple not in seen or seen[new_board_tuple] > new_energy:
-                    result.append((new_board, new_energy))
-                    seen[new_board_tuple] = new_energy
+                out = (new_board[0] != '.').sum()
+                if (new_board_tuple not in new_candidates[out]) or new_energy < new_candidates[out][new_board_tuple][1]:
+                    new_candidates[out][new_board_tuple] = (new_board, new_energy)
         current |= next_steps
     return result
 
@@ -120,19 +121,20 @@ def is_winning(board):
 
 def play(board: np.array):
     min_energy = math.inf
-    candidate_states = [(board, 0)]
-    seen = {to_tuple(board): 0}
+    candidate_states = defaultdict(dict)
+    candidate_states[0][to_tuple(board)] = (board, 0)
     while candidate_states:
-        new_candidate_states = []
-        for c in candidate_states:
-            if is_winning(c[0]):
-                min_energy = c[1] if min_energy is None else min(min_energy, c[1])
-                continue
-            if c[1] > min_energy:
-                continue
-            to_move = free_amphipods(c[0])
-            for x0, x1 in zip(*to_move):
-                new_candidate_states.extend(find_next_moves(x0, x1, seen, *c))
+        new_candidate_states = defaultdict(dict)
+        for s, candidates in sorted(candidate_states.items()):
+            for c in sorted(candidates.values(), key=lambda x: x[1]):
+                if is_winning(c[0]):
+                    min_energy = c[1] if min_energy is None else min(min_energy, c[1])
+                    continue
+                if c[1] > min_energy:
+                    continue
+                to_move = free_amphipods(c[0])
+                for x0, x1 in zip(*to_move):
+                    find_next_moves(x0, x1, new_candidate_states, *c)
         candidate_states = new_candidate_states
     return min_energy
 
