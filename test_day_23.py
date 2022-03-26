@@ -36,7 +36,7 @@ def get_data_part_two(input_file):
             new_data = np.zeros_like(board, shape=(board.shape[0]+2, board.shape[1]))
             new_data[0:2] = board[0:2]
             new_data[2:4] = np.array([list(line) for line in unfold])
-            new_data[4:] = board[4:]
+            new_data[4:] = board[2:]
         else:
             new_data = board
         result.append(new_data)
@@ -77,11 +77,11 @@ def legal_move(amphipod, board, x0, z0, z1):
 
 def find_next_moves(x0, x1, new_candidates, board, energy):
     amphipod = board[x0, x1]
-    result = []
     steps = 0
     current = np.zeros_like(board, dtype=bool)
     current[x0, x1] = True
     next_steps = current
+    next_moves = defaultdict(dict)
     while next_steps.any():
         steps += 1
         next_steps = one_step(current, board)
@@ -90,13 +90,17 @@ def find_next_moves(x0, x1, new_candidates, board, energy):
                 new_board = board.copy()
                 new_board[z0, z1] = board[x0, x1]
                 new_board[x0, x1] = '.'
+                out = (new_board[0] != '.').sum()
+                if out - 1 in next_moves:
+                    continue
                 new_board_tuple = to_tuple(new_board)
                 new_energy = energy + steps*energies[amphipod]
-                out = (new_board[0] != '.').sum()
-                if (new_board_tuple not in new_candidates[out]) or new_energy < new_candidates[out][new_board_tuple][1]:
-                    new_candidates[out][new_board_tuple] = (new_board, new_energy)
+                if (new_board_tuple not in new_candidates) or new_energy < new_candidates[new_board_tuple][1]:
+                    next_moves[out][new_board_tuple] = (new_board, energy)
         current |= next_steps
-    return result
+    min_out = sorted(n for n in next_moves.keys() if next_moves[n])
+    if min_out:
+        new_candidates.update(next_moves[min_out[0]])
 
 
 def free_amphipods(board):
@@ -121,20 +125,18 @@ def is_winning(board):
 
 def play(board: np.array):
     min_energy = math.inf
-    candidate_states = defaultdict(dict)
-    candidate_states[0][to_tuple(board)] = (board, 0)
+    candidate_states = {to_tuple(board): (board, 0)}
     while candidate_states:
-        new_candidate_states = defaultdict(dict)
-        for s, candidates in sorted(candidate_states.items()):
-            for c in sorted(candidates.values(), key=lambda x: x[1]):
-                if is_winning(c[0]):
-                    min_energy = c[1] if min_energy is None else min(min_energy, c[1])
-                    continue
-                if c[1] > min_energy:
-                    continue
-                to_move = free_amphipods(c[0])
-                for x0, x1 in zip(*to_move):
-                    find_next_moves(x0, x1, new_candidate_states, *c)
+        new_candidate_states = {}
+        for c in candidate_states.values():
+            if is_winning(c[0]):
+                min_energy = c[1] if min_energy is None else min(min_energy, c[1])
+                continue
+            if c[1] > min_energy:
+                continue
+            to_move = free_amphipods(c[0])
+            for x0, x1 in zip(*to_move):
+                find_next_moves(x0, x1, new_candidate_states, *c)
         candidate_states = new_candidate_states
     return min_energy
 
