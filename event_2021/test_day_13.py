@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+from numpy.lib import recfunctions as rfn
 
 
 expected_code_example = """
@@ -23,7 +24,8 @@ expected_code = """
 
 
 def get_data(input_file):
-    coordinates = np.fromregex(input_file, r'(\d+),(\d+)', dtype=int)
+    coordinates = rfn.structured_to_unstructured(
+        np.fromregex(input_file, r'(\d+),(\d+)', dtype=np.dtype("int32,int32")))
     foldings = np.fromregex(input_file, r'fold along (x|y)=(\d+)', dtype=[('axis', 'S1'), ('num', int)])
     data = np.zeros(np.amax(coordinates, axis=0) + 1, dtype=bool)
     data[coordinates[:, 0], coordinates[:, 1]] = True

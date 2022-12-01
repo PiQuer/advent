@@ -1,9 +1,12 @@
 import numpy as np
+from numpy.lib import recfunctions as rfn
 import pytest
 
 
 def get_data(input_file: str):
-    return np.fromregex(input_file, "(\d+),(\d+) -> (\d+),(\d+)", dtype=int).reshape((-1, 2, 2))
+    data_type = np.dtype(','.join(['int32'] * 4))
+    data = np.fromregex(input_file, r"(\d+),(\d+) -> (\d+),(\d+)", dtype=data_type)
+    return rfn.structured_to_unstructured(data).reshape((-1, 2, 2))
 
 
 def poor_mans_line_algorithm(points, mat):

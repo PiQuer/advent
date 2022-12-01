@@ -1,6 +1,7 @@
 import pytest
 from pytest_cases import fixture
 import numpy as np
+from numpy.lib import recfunctions as rfn
 import math
 
 
@@ -9,7 +10,9 @@ import math
                          (("input/day_17_example.txt", 45, 112),
                           ("input/day_17.txt", 9180, 3767)))
 def get_data(input_file: str, expected_1, expected_2):
-    return np.fromregex(input_file, r"target area: x=(\d+)\.\.(\d+), y=(-\d+)\.\.(-\d+)", dtype=int)[0], \
+    return rfn.structured_to_unstructured(
+        np.fromregex(input_file, r"target area: x=(\d+)\.\.(\d+), y=(-\d+)\.\.(-\d+)",
+                     dtype="int32,int32,int32,int32")[0]), \
            expected_1, expected_2
 
 

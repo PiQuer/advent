@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from utils import shift
+from event_2021.utils import shift
 
 hightmap_max = 9
 
