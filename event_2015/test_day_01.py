@@ -8,7 +8,7 @@ input_files_round_1 = (
     (Path("input/day_01_example_03.txt"), 3),
     (Path("input/day_01_example_04.txt"), -1),
     (Path("input/day_01_example_05.txt"), -3),
-    (Path("input/day_01.txt"), 0),
+    (Path("input/day_01.txt"), 138),
 )
 
 
