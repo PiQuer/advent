@@ -1,26 +1,34 @@
 import pytest
 from pathlib import Path
+from utils import dataset_parametrization, DataSetBase
 
 FILE_NAMES = {'example': Path("input/day_02_example.txt"), 'real': Path("input/day_02.txt")}
 
 
-def get_data(data_set: str):
-    with FILE_NAMES[data_set].open() as f:
-        for line in f:
+class DataSet(DataSetBase):
+    def preprocess(self):
+        for line in super().preprocess():
             yield ord(line[0]) - 65, ord(line[2]) - 88
 
 
-def calculate(data_set: str, second_column_is_outcome: bool):
+round_1 = dataset_parametrization(day="02", examples=[("", 15)], result=10310, dataset_class=DataSet)
+round_2 = dataset_parametrization(day="02", examples=[("", 12)], result=14859, dataset_class=DataSet)
+
+
+def calculate(dataset: DataSet, second_column_is_outcome: bool):
     score = 0
-    for p1, p2 in get_data(data_set):
+    for p1, p2 in dataset.preprocess():
         if second_column_is_outcome:
             p2 = (p1 + p2 - 1) % 3
         score += p2 + 1 + ((p2 - p1 + 1) % 3) * 3
     return score
 
 
-@pytest.mark.parametrize("data_set,second_column_is_outcome,expected",
-                         (("example", False, 15), ("real", False, 10310),
-                          ("example", True, 12), ("real", True, 14859)))
-def test_score(data_set, expected, second_column_is_outcome):
-    assert calculate(data_set, second_column_is_outcome) == expected
+@pytest.mark.parametrize(**round_1)
+def test_round_1(dataset: DataSet):
+    assert calculate(dataset, second_column_is_outcome=False) == dataset.result
+
+
+@pytest.mark.parametrize(**round_2)
+def test_round_2(dataset: DataSet):
+    assert calculate(dataset, second_column_is_outcome=True) == dataset.result
