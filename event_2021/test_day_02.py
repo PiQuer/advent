@@ -10,7 +10,7 @@ def get_masks(data):
     return map(lambda x: data['dir'] == x, (b'fo', b'up', b'do'))
 
 
-@pytest.mark.parametrize("input_file", ["input/day_02_example.txt", "input/day_02.txt"])
+@pytest.mark.parametrize("input_file", ["input/day_02_example_01.txt", "input/day_02.txt"])
 class TestDay02:
     def test_part_one(self, input_file: str):
         data = get_data(input_file)
