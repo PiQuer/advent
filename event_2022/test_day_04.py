@@ -3,8 +3,8 @@ from utils import dataset_parametrization, DataSetBase
 
 
 class DataSet(DataSetBase):
-    def preprocess(self):
-        for line in super().preprocess():
+    def lines(self):
+        for line in super().lines():
             range1, range2 = line.split(',')
             yield tuple(int(i) for i in range1.split('-')), tuple(int(i) for i in range2.split('-'))
 
@@ -27,9 +27,9 @@ def overlap(pair1: tuple, pair2: tuple):
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetBase):
-    assert sum(contained_both_ways(pair1, pair2) for pair1, pair2 in dataset.preprocess()) == dataset.result
+    assert sum(contained_both_ways(pair1, pair2) for pair1, pair2 in dataset.lines()) == dataset.result
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSetBase):
-    assert sum(overlap(pair1, pair2) for pair1, pair2 in dataset.preprocess()) == dataset.result
+    assert sum(overlap(pair1, pair2) for pair1, pair2 in dataset.lines()) == dataset.result

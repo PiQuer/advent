@@ -3,7 +3,7 @@ from utils import dataset_parametrization, DataSetBase
 
 
 class DataSet(DataSetBase):
-    def preprocess(self):
+    def lines(self):
         current = 0
         for line in self.input_file.read_text().split('\n'):
             if not line:
@@ -20,7 +20,7 @@ round_2 = dataset_parametrization(day="01", examples=[("", 45000)], result=19680
 @pytest.mark.benchmark(warmup=True, warmup_iterations=100)
 class Base:
     def test_with_sort(self, dataset: DataSet):
-        return sum(sorted(dataset.preprocess())[-self.top:])
+        return sum(sorted(dataset.lines())[-self.top:])
 
 
 @pytest.mark.parametrize(**round_1)

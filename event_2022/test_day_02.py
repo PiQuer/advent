@@ -6,8 +6,8 @@ FILE_NAMES = {'example': Path("input/day_02_example.txt"), 'real': Path("input/d
 
 
 class DataSet(DataSetBase):
-    def preprocess(self):
-        for line in super().preprocess():
+    def lines(self):
+        for line in super().lines():
             yield ord(line[0]) - 65, ord(line[2]) - 88
 
 
@@ -17,7 +17,7 @@ round_2 = dataset_parametrization(day="02", examples=[("", 12)], result=14859, d
 
 def calculate(dataset: DataSet, second_column_is_outcome: bool):
     score = 0
-    for p1, p2 in dataset.preprocess():
+    for p1, p2 in dataset.lines():
         if second_column_is_outcome:
             p2 = (p1 + p2 - 1) % 3
         score += p2 + 1 + ((p2 - p1 + 1) % 3) * 3

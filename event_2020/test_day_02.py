@@ -12,8 +12,8 @@ class PasswordLine:
 
 
 class DataSet(DataSetBase):
-    def preprocess(self):
-        for line in super().preprocess():
+    def lines(self):
+        for line in super().lines():
             r, c, p = line.split(' ')
             m1, m2 = (int(i) for i in r.split('-'))
             yield PasswordLine(m1=m1, m2=m2, char=c[0], pwd=p)
@@ -25,10 +25,10 @@ round_2 = dataset_parametrization(day="02", examples=[], result=699, dataset_cla
 
 @pytest.mark.parametrize(**round_1)
 def test_round1(dataset: DataSet):
-    assert sum(1 for p in dataset.preprocess() if p.m1 <= p.pwd.count(p.char) <= p.m2) == dataset.result
+    assert sum(1 for p in dataset.lines() if p.m1 <= p.pwd.count(p.char) <= p.m2) == dataset.result
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round2(dataset: DataSet):
-    assert sum(1 for p in dataset.preprocess()
+    assert sum(1 for p in dataset.lines()
                if (p.pwd[p.m1 - 1] == p.char) + (p.pwd[p.m2 - 1] == p.char) == 1) == dataset.result

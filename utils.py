@@ -9,8 +9,11 @@ class DataSetBase:
     result: Any
     id: str
 
-    def preprocess(self):
+    def lines(self):
         return self.input_file.read_text().splitlines()
+
+    def text(self):
+        return self.input_file.read_text()
 
 
 # noinspection PyArgumentList

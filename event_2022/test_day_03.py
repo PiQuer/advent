@@ -13,7 +13,7 @@ def priority(c):
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset):
     priority_sum = 0
-    for line in dataset.preprocess():
+    for line in dataset.lines():
         half = len(line) // 2
         priority_sum += priority((set(line[:half]) & set(line[half:])).pop())
     assert priority_sum == dataset.result
@@ -22,7 +22,7 @@ def test_round_1(dataset):
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset):
     priority_sum = 0
-    data = dataset.preprocess()
+    data = dataset.lines()
     for g in range(0, len(data), 3):
         priority_sum += priority((set(data[g]) & set(data[g+1]) & set(data[g+2])).pop())
     assert priority_sum == dataset.result
