@@ -1,39 +1,29 @@
 import pytest
-from pathlib import Path
 import numpy as np
+from utils import dataset_parametrization, DataSetBase
 
 
-input_files_round_1 = (
-    (Path("input/day_01_example_01.txt"), 5),
-    (Path("input/day_01_example_02.txt"), 2),
-    (Path("input/day_01_example_03.txt"), 12),
-    (Path("input/day_01.txt"), 300),
-)
-
-
-input_files_round_2 = (
-    (Path("input/day_01_example_04.txt"), 4),
-    (Path("input/day_01.txt"), 159),
-)
+round_1 = dataset_parametrization(day="01", examples=[("_01", 5), ("_02", 2), ("_03", 12)], result=300)
+round_2 = dataset_parametrization(day="01", examples=[("_04", 4)], result=159)
 
 
 rotation = {'R': np.array([[0, -1], [1, 0]]), 'L': np.array([[0, 1], [-1, 0]])}
 
 
-@pytest.mark.parametrize("data_file,expected", input_files_round_1)
-def test_round_1(data_file, expected):
-    data = data_file.read_text().split(', ')
+@pytest.mark.parametrize(**round_1)
+def test_round_1(dataset: DataSetBase):
+    data = dataset.text().split(', ')
     pos = np.array([0, 0])
     heading = np.array([1, 0])
     for direction in data:
         heading = np.matmul(rotation[direction[0]], heading)
         pos += heading * int(direction[1:])
-    assert expected == np.sum(np.abs(pos))
+    assert np.sum(np.abs(pos)) == dataset.result
 
 
-@pytest.mark.parametrize("data_file,expected", input_files_round_2)
-def test_round_2(data_file, expected):
-    data = data_file.read_text().split(', ')
+@pytest.mark.parametrize(**round_2)
+def test_round_2(dataset: DataSetBase):
+    data = dataset.text().split(', ')
     pos = np.array([0, 0])
     heading = np.array([1, 0])
     seen = {tuple(pos)}
@@ -48,4 +38,4 @@ def test_round_2(data_file, expected):
             seen.add(tuple(pos))
         if done:
             break
-    assert expected == np.sum(np.abs(pos))
+    assert np.sum(np.abs(pos)) == dataset.result

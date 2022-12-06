@@ -1,6 +1,6 @@
 import pytest
-from pathlib import Path
 import numpy as np
+from utils import dataset_parametrization, DataSetBase
 
 
 keypad_1 = np.array(
@@ -31,16 +31,8 @@ directions = {
 }
 
 
-input_files_round_1 = (
-    (Path("input/day_02_example.txt"), 1985),
-    (Path("input/day_02.txt"), 78293),
-)
-
-
-input_files_round_2 = (
-    (Path("input/day_02_example.txt"), 0x5DB3),
-    (Path("input/day_02.txt"), 0xAC8C8),
-)
+round_1 = dataset_parametrization(day="02", examples=[("", 1985)], result=78293)
+round_2 = dataset_parametrization(day="02", examples=[("", 0x5DB3)], result=0xAC8C8)
 
 
 def calculate_code(data, pos, keypad, base=10):
@@ -53,11 +45,11 @@ def calculate_code(data, pos, keypad, base=10):
     return code
 
 
-@pytest.mark.parametrize("input_file,expected", input_files_round_1)
-def test_round_1(input_file, expected):
-    assert calculate_code(input_file.read_text().splitlines(), (2, 2), keypad_1) == expected
+@pytest.mark.parametrize(**round_1)
+def test_round_1(dataset: DataSetBase):
+    assert calculate_code(dataset.lines(), (2, 2), keypad_1) == dataset.result
 
 
-@pytest.mark.parametrize("input_file,expected", input_files_round_2)
-def test_round_2(input_file, expected):
-    assert calculate_code(input_file.read_text().splitlines(), (3, 1), keypad_2, base=16) == expected
+@pytest.mark.parametrize(**round_2)
+def test_round_2(dataset: DataSetBase):
+    assert calculate_code(dataset.lines(), (3, 1), keypad_2, base=16) == dataset.result
