@@ -1,6 +1,8 @@
-from typing import Sequence, Any
+from typing import Sequence, Any, Iterator
 from pathlib import Path
 from dataclasses import dataclass
+from itertools import product
+import numpy as np
 
 
 @dataclass
@@ -24,3 +26,27 @@ def dataset_parametrization(day: str, examples: Sequence[tuple[str, Any]], resul
                               id=f"example{example[0]}") for example in examples]
     puzzle = dataset_class(input_file=Path(f"input/day_{day}.txt"), result=result, id="puzzle")
     return {'argnames': "dataset", 'argvalues': examples + [puzzle], 'ids': lambda x: x.id}
+
+
+def grid() -> Iterator[tuple[int, int]]:
+    return (a for a in product((-1, 0, 1), repeat=2))
+
+
+def adjacent_with_diag() -> Iterator[tuple[int, int]]:
+    return (a for a in grid() if a != (0, 0))
+
+
+def adjacent() -> Iterator[tuple[int, int]]:
+    return (a for a in adjacent_with_diag() if abs(a[0]) != abs(a[1]))
+
+
+def np_grid() -> Iterator[np.array]:
+    return (np.array(a) for a in grid())
+
+
+def np_adjacent_with_diag() -> Iterator[np.array]:
+    return (np.array(a) for a in adjacent_with_diag())
+
+
+def np_adjacent() -> Iterator[np.array]:
+    return (np.array(a) for a in adjacent())
