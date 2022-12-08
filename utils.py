@@ -11,11 +11,17 @@ class DataSetBase:
     result: Any
     id: str
 
-    def lines(self):
+    def lines(self) -> list[str]:
         return self.input_file.read_text().splitlines()
 
-    def text(self):
+    def text(self) -> str:
         return self.input_file.read_text()
+
+    def np_array(self) -> np.array:
+        return np.loadtxt(self.input_file, dtype=np.int32)
+
+    def np_array_digits(self) -> np.array:
+        return np.genfromtxt(self.input_file, dtype=int, delimiter=1)
 
 
 # noinspection PyArgumentList
