@@ -5,7 +5,7 @@ from utils import dataset_parametrization, DataSetBase
 
 
 class DataSet(DataSetBase):
-    def lines(self):
+    def preprocessed_lines(self):
         i = iter(super().lines())
         stack_dict = defaultdict(lambda: [])
         for line in reversed(list(takewhile(lambda x: x[:2] != ' 1', i))):
@@ -26,7 +26,7 @@ class Day05Base:
     model = None
 
     def test_restack(self, dataset: DataSet):
-        it = dataset.lines()
+        it = dataset.preprocessed_lines()
         stack = next(it)
         for num, f, t in it:
             if self.model == 9000:

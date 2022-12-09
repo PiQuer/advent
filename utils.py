@@ -56,3 +56,11 @@ def np_adjacent_with_diag() -> Iterator[np.array]:
 
 def np_adjacent() -> Iterator[np.array]:
     return (np.array(a) for a in adjacent())
+
+
+def directions() -> dict[str, tuple[int, int]]:
+    return dict(zip(('l', 'u', 'd', 'r'), adjacent()))
+
+
+def np_directions() -> dict[str, np.array]:
+    return dict(zip(('l', 'u', 'd', 'r'), np_adjacent()))
