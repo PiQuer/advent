@@ -345,6 +345,17 @@ files = [
 numpy = ">=1.17.3,<1.25.0"
 
 [[package]]
+name = "tinyarray"
+version = "1.2.4"
+description = "Arrays of numbers for Python, optimized for small sizes"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "tinyarray-1.2.4.tar.gz", hash = "sha256:ecd3428fd8a48b61fc5f0a413ede03e27db3a1dd53fcd49e24a36d11a8a29aba"},
+]
+
+[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -359,4 +370,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "14d3b6dde56dee3c4a6dbb66173ac0bec3632f9d83a3eaac2bcd82026f269e0d"
+content-hash = "259841cb6e789a6b6da038881f579a681fdcc7b1c833bb97d221f4ed56bb5165"

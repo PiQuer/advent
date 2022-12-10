@@ -3,6 +3,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from itertools import product, tee
 import numpy as np
+import tinyarray as ta
 
 
 @dataclass
@@ -62,6 +63,10 @@ def np_adjacent() -> Iterator[np.array]:
     return (np.array(a) for a in adjacent())
 
 
+def ta_adjacent() -> Iterator[ta.array]:
+    return (ta.array(a) for a in adjacent())
+
+
 def directions() -> dict[str, tuple[int, int]]:
     return dict(zip(('l', 'u', 'd', 'r'), adjacent()))
 
@@ -70,7 +75,5 @@ def np_directions() -> dict[str, np.array]:
     return dict(zip(('l', 'u', 'd', 'r'), np_adjacent()))
 
 
-def pairwise(iterable):
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
+def ta_directions() -> dict[str, ta.array]:
+    return dict(zip(('l', 'u', 'd', 'r'), ta_adjacent()))
