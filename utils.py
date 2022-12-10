@@ -17,11 +17,15 @@ class DataSetBase:
     def text(self) -> str:
         return self.input_file.read_text()
 
-    def np_array(self) -> np.array:
-        return np.loadtxt(self.input_file, dtype=np.int32)
+    def np_array(self, dtype=np.int32) -> np.array:
+        return np.loadtxt(self.input_file, dtype=dtype)
 
     def np_array_digits(self) -> np.array:
         return np.genfromtxt(self.input_file, dtype=int, delimiter=1)
+
+    def np_array_bytes(self) -> np.array:
+        x = np.array(self.lines(), dtype=bytes)
+        return x.view('S1').reshape((x.size, -1))
 
 
 # noinspection PyArgumentList
