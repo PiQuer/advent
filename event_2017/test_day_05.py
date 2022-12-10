@@ -1,5 +1,4 @@
 from itertools import count
-import numpy as np
 import pytest
 from utils import dataset_parametrization, DataSetBase
 
@@ -10,7 +9,7 @@ round_2 = dataset_parametrization(day="05", examples=[("", 10)], result=29629538
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetBase):
-    maze = dataset.np_array()
+    maze = [int(i) for i in dataset.lines()]
     instruction = step = 0
     try:
         for step in count():
@@ -23,11 +22,11 @@ def test_round_1(dataset: DataSetBase):
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSetBase):
-    maze = dataset.np_array()
+    maze = [int(i) for i in dataset.lines()]
     instruction = step = 0
     try:
         for step in count():
-            maze[instruction] = (offset := maze[instruction]) + np.sign(2.5 - offset)
+            maze[instruction] = (offset := maze[instruction]) + (1 if offset < 3 else -1)
             instruction += offset
     except IndexError:
         pass
