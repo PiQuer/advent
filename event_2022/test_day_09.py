@@ -1,14 +1,18 @@
 import pytest
-import numpy as np
-from itertools import repeat, pairwise, starmap
+from itertools import repeat, starmap
+from operator import abs, sub, add
+try:
+    from itertools import pairwise
+except ImportError:
+    from utils import pairwise
 from more_itertools import consume
 
-from utils import dataset_parametrization, DataSetBase, np_directions
+from utils import dataset_parametrization, DataSetBase, directions
 
 
 class DataSet(DataSetBase):
     def directions(self):
-        d = np_directions()
+        d = directions()
         for line in self.lines():
             yield from repeat(d[line[0].lower()], int(line[2:]))
 

@@ -1,7 +1,7 @@
 from typing import Sequence, Any, Iterator
 from pathlib import Path
 from dataclasses import dataclass
-from itertools import product
+from itertools import product, tee
 import numpy as np
 
 
@@ -68,3 +68,9 @@ def directions() -> dict[str, tuple[int, int]]:
 
 def np_directions() -> dict[str, np.array]:
     return dict(zip(('l', 'u', 'd', 'r'), np_adjacent()))
+
+
+def pairwise(iterable):
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
