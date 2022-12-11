@@ -47,7 +47,7 @@ def test_round_1(dataset: DataSet):
 def test_round_2(dataset: DataSet):
     width = 40
     crt = np.fromiter((sprite-1 <= crt % width <= sprite+1 for crt, sprite in enumerate(dataset.preprocess())),
-                      dtype=np.bool)
+                      dtype=bool)
     display = '\n'.join(''.join(line) for line in chunked(np.where(crt, b'#', b'.').tobytes().decode(), width))
     print("")
     print(display)
