@@ -1,7 +1,7 @@
 from typing import Sequence, Any, Iterator
 from pathlib import Path
 from dataclasses import dataclass
-from itertools import product, tee
+from itertools import product
 import numpy as np
 import tinyarray as ta
 
@@ -17,6 +17,9 @@ class DataSetBase:
 
     def text(self) -> str:
         return self.input_file.read_text()
+
+    def separated_by_empty_line(self):
+        return self.input_file.read_text().split("\n\n")
 
     def np_array(self, dtype=np.int32) -> np.array:
         return np.loadtxt(self.input_file, dtype=dtype)
