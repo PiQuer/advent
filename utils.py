@@ -1,4 +1,4 @@
-from typing import Sequence, Any, Iterator
+from typing import Sequence, Any, Iterator, Union, Optional
 from pathlib import Path
 from dataclasses import dataclass
 from itertools import product
@@ -80,3 +80,10 @@ def np_directions() -> dict[str, np.array]:
 
 def ta_directions() -> dict[str, ta.array]:
     return dict(zip(('l', 'u', 'd', 'r'), ta_adjacent()))
+
+
+@dataclass
+class Waypoint:
+    length: Union[int, float]
+    previous: Optional[Union[tuple[int, int], ta.array]]
+    value: Optional[Any] = None

@@ -1,14 +1,7 @@
 import pytest
 import numpy as np
-from dataclasses import dataclass
-from typing import Tuple
 
-
-@dataclass
-class Waypoint:
-    length: int
-    previous: Tuple[int, int]
-    risk: int
+from utils import Waypoint
 
 
 def get_data_part_one(input_file):
@@ -33,9 +26,9 @@ def get_best_paths(length, best_paths, data, candidates):
         next_points = (_next for _next in ((x+1, y), (x, y+1), (x-1, y), (x, y-1))
                        if 0 <= _next[0] < data.shape[0] and 0 <= _next[1] < data.shape[1])
         for n in next_points:
-            next_risk = best_paths[(x, y)].risk + data[n]
-            if n not in best_paths or best_paths[n].risk > next_risk:
-                best_paths[n] = Waypoint(length=length, previous=(x, y), risk=next_risk)
+            next_risk = best_paths[(x, y)].value + data[n]
+            if n not in best_paths or best_paths[n].value > next_risk:
+                best_paths[n] = Waypoint(length=length, previous=(x, y), value=next_risk)
                 next_candidates.append(n)
     return next_candidates
 
@@ -57,7 +50,7 @@ def visualize_path(data, best_path):
                           ("input/day_15.txt", get_data_part_two, 2927)))
 def test_day_15(input_file, data_fn, expected):
     data = data_fn(input_file)
-    best_paths = {(0, 0): Waypoint(previous=(0, 0), length=0, risk=0)}
+    best_paths = {(0, 0): Waypoint(previous=(0, 0), length=0, value=0)}
     length = 1
     candidates = [(0, 0)]
     while True:
@@ -65,6 +58,6 @@ def test_day_15(input_file, data_fn, expected):
         if not candidates:
             break
         length += 1
-    result = best_paths[(data.shape[0]-1, data.shape[1]-1)].risk
+    result = best_paths[(data.shape[0]-1, data.shape[1]-1)].value
     _path = visualize_path(data, best_paths)
     assert result == expected
