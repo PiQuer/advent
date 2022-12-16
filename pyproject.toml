@@ -13,6 +13,7 @@ pytest-cases = "^3.6.5"
 scipy = { version = "^1.7.3", optional = true }
 more-itertools = "^9.0.0"
 tinyarray = "^1.2.4"
+networkx = "^2.8.8"
 
 [tool.poetry.extras]
 scipy = ["scipy"]
