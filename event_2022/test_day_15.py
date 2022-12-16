@@ -4,29 +4,25 @@ https://adventofcode.com/2022/day/15
 from functools import partial
 from typing import Optional
 import pytest
-from more_itertools import consume
-from dataclasses import dataclass
+from more_itertools import consume, pairwise
 import tinyarray as ta
 import re
-from itertools import pairwise, starmap
-from operator import methodcaller
+from itertools import starmap
 from utils import dataset_parametrization, DataSetBase
 
-@dataclass
-class Interval:
-    left: int
-    right: int
-    y: int
 
-    def len(self) -> int:
-        return self.right - self.left
+def i_len(interval: list[int]) -> int:
+    return interval[1] - interval[0]
 
-def intersect(a: Interval, b: Interval):
-    b.left = max(b.left, a.right)
-    b.right = max(b.right, a.right)
+
+def intersect(a: list[int], b: list[int]):
+    b[0] = max(b[0], a[1])
+    b[1] = max(b[1], a[1])
+
 
 class EndOfProblem(Exception):
     pass
+
 
 class DataSet(DataSetBase):
     def __init__(self, *args, **kwargs):
@@ -42,9 +38,9 @@ class DataSet(DataSetBase):
             self.beacons.append(ta.array(tuple(map(int, match.groups()[2:4]))))
 
     @staticmethod
-    def get_interval(sensor: ta.array, beacon: ta.array, y: int) -> Optional[Interval]:
+    def get_interval(sensor: ta.array, beacon: ta.array, y: int) -> Optional[list[int]]:
         if (dx := sum(ta.abs(beacon - sensor)) - abs(sensor[1] - y)) >= 0:
-            return Interval(sensor[0] - dx, sensor[0] + dx + 1, y)
+            return [sensor[0] - dx, sensor[0] + dx + 1, y]
 
     def intervals(self, y: int):
         return filter(bool, starmap(partial(self.get_interval, y=y), zip(self.sensors, self.beacons)))
@@ -57,19 +53,21 @@ round_2 = dataset_parametrization(day="15", examples=[("", 56000011)], result=13
 @pytest.mark.parametrize(**round_1)
 def test_round_1(request, dataset: DataSet):
     y = 10 if "example" in request.node.name else 2_000_000
-    intervals = sorted(dataset.intervals(y=y), key=lambda x: x.left)
+    intervals = sorted(dataset.intervals(y=y), key=lambda x: x[0])
     consume(starmap(intersect, pairwise(intervals)))
-    assert sum(map(methodcaller("len"), intervals)) - len({b for b in dataset.beacons if b[1] == y}) == dataset.result
+    assert sum(map(i_len, intervals)) - len({b for b in dataset.beacons if b[1] == y}) == dataset.result
 
 
-def intersect_and_check(a: Interval, b: Interval, bound: int):
-    b.left = max(b.left, a.right)
-    b.right = max(b.right, a.right)
-    if b.left - a.right == 1 and 0 <= a.right <= bound:
+def intersect_and_check(a: list[int], b: list[int], bound: int):
+    b[0] = max(b[0], a[1])
+    b[1] = max(b[1], a[1])
+    if b[0] - a[1] == 1 and 0 <= a[1] <= bound:
         raise EndOfProblem(a)
 
-def key_fn(x: Interval):
-    return x.left
+
+def key_fn(x: list[int]):
+    return x[0]
+
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(request, dataset: DataSet):
@@ -82,6 +80,6 @@ def test_round_2(request, dataset: DataSet):
                                                    map(dataset.intervals, range(bound, -1, -1)))))))
     except EndOfProblem as e:
         print(f"{e.args[0]} {y}")
-        assert e.args[0].right * 4_000_000 + e.args[0].y == dataset.result
+        assert e.args[0][1] * 4_000_000 + e.args[0][2] == dataset.result
     else:
         assert False

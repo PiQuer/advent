@@ -1,8 +1,8 @@
 """
 https://adventofcode.com/2022/day/14
 """
-from itertools import pairwise, product, repeat, takewhile
-from more_itertools import iterate
+from itertools import product, repeat, takewhile
+from more_itertools import iterate, pairwise
 from typing import Optional
 import pytest
 import tinyarray as ta
@@ -15,7 +15,7 @@ class DataSet(DataSetBase):
     def build_map(self):
         cave = defaultdict(lambda: '.')
         for line in self.lines():
-            for a,b in pairwise(map(methodcaller("split", ","), line.split(" -> "))):
+            for a, b in pairwise(map(methodcaller("split", ","), line.split(" -> "))):
                 a = ta.array(tuple(map(int, a)))
                 b = ta.array(tuple(map(int, b)))
                 for x, y in product(range(min(a[0], b[0]), max(a[0], b[0]) + 1),

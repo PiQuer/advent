@@ -3,7 +3,13 @@ import pytest
 import re
 from pathlib import Path
 import itertools
-from scipy.spatial.transform import Rotation
+try:
+    from scipy.spatial.transform import Rotation
+    HAS_SCIPY = True
+except ImportError:
+    from unittest.mock import Mock
+    Rotation = Mock()
+    HAS_SCIPY = False
 import math
 
 overlap_threshold = 12
@@ -49,6 +55,7 @@ def align(reports, distances, index_0, index_1):
     return False, None
 
 
+@pytest.mark.skipif(not HAS_SCIPY, reason="scipy not available")
 @pytest.mark.parametrize("input_file,expected_one, expected_two",
                          (("input/day_19_example.txt", 79, 3621),
                           ("input/day_19.txt", 462, 12158)))
