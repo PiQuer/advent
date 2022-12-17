@@ -10,6 +10,7 @@ from itertools import cycle, islice
 from dataclasses import dataclass
 from collections import deque
 import math
+import logging
 from utils import dataset_parametrization, DataSetBase
 
 
@@ -40,6 +41,28 @@ round_2 = dataset_parametrization(day="17", examples=[("", 1_514_285_714_288)], 
 def visualize(c: np.array):
     for row in np.array(c)[::-1]:
         print(''.join('#' if x else ' ' for x in row))
+
+
+class CycleDetector:
+    threshold = 2 * len(rocks)
+    max_cyc = 20
+
+    def __init__(self, lcm: int):
+        self._lcm = lcm
+        self._deques = {}
+        for i in range(1, self.max_cyc + 1):
+            self._deques[i] = deque()
+
+    def check(self, state: tuple, idx: int):
+        for i in range(1, self.max_cyc + 1):
+            self._deques[i].append(state)
+            if len(self._deques[i]) > i * self._lcm + self.threshold:
+                self._deques[i].popleft()
+                if list(map(itemgetter(slice(0, 2)), list(islice(self._deques[i], self.threshold)))) == \
+                        list(map(itemgetter(slice(0, 2)),
+                                 list(reversed(list(islice(reversed(self._deques[i]), self.threshold)))))):
+                    raise EndOfProblem(self._deques[i], idx, i*self._lcm)
+        pass
 
 
 @pytest.mark.parametrize(**round_1)
@@ -84,29 +107,35 @@ def test_round_2(dataset: DataSetBase):
     rock_it = cycle(enumerate(rocks))
     c = np.ones((1, 7), dtype=int)
     total_removed = 0
-    cyc = deque()
     lcm = math.lcm(len(rocks), len(dataset.text()))
-    for idx, (rock_idx, rock) in enumerate(rock_it):
-        if idx % 100 == 99:
-            removed, c = housekeeping(c)
-            total_removed += removed
-        row = np.argwhere(np.max(c, axis=1))[-1][0] + 3 + rock.height
-        col = 2
-        if (append := row - c.shape[0] + 1) > 0:
-            c = np.concatenate([c, np.zeros((append, c.shape[1]), dtype=int)], axis=0)
-        for jet in jet_it:
-            if 0 <= col + jet <= c.shape[1] - rock.width:
-                if not np.any(np.logical_and(c[row-rock.height+1:row+1, col+jet:col+jet+rock.width], rock.sprite)):
-                    col += jet
-            if not np.any(np.logical_and(c[row-rock.height:row, col:col+rock.width], rock.sprite)):
-                row -= 1
-            else:
-                c[row - rock.height + 1:row + 1, col:col + rock.width] += rock.sprite
-                cyc.append((rock_idx, col, np.argwhere(np.max(c, axis=1))[-1][0] + total_removed))
-                if len(cyc) > 2*lcm + 5:
-                    cyc.popleft()
-                    if list(map(itemgetter(slice(0, 2)), list(islice(cyc, 5)))) == \
-                            list(map(itemgetter(slice(0, 2)), list(reversed(list(islice(reversed(cyc), 5)))))):
-                        raise EndOfProblem()
-                break
-    assert np.argwhere(np.max(c, axis=1))[-1][0] + total_removed == dataset.result
+    cycle_detector = CycleDetector(lcm)
+    logging.info("LCM: %d", lcm)
+    try:
+        for idx, (rock_idx, rock) in enumerate(rock_it):
+            if idx % (lcm//10) == 0:
+                logging.info("Index, Index/LCM: %d, %f", idx, idx/lcm)
+            if idx % 100 == 99:
+                removed, c = housekeeping(c)
+                total_removed += removed
+            row = np.argwhere(np.max(c, axis=1))[-1][0] + 3 + rock.height
+            col = 2
+            if (append := row - c.shape[0] + 1) > 0:
+                c = np.concatenate([c, np.zeros((append, c.shape[1]), dtype=int)], axis=0)
+            for jet in jet_it:
+                if 0 <= col + jet <= c.shape[1] - rock.width:
+                    if not np.any(np.logical_and(c[row-rock.height+1:row+1, col+jet:col+jet+rock.width], rock.sprite)):
+                        col += jet
+                if not np.any(np.logical_and(c[row-rock.height:row, col:col+rock.width], rock.sprite)):
+                    row -= 1
+                else:
+                    c[row - rock.height + 1:row + 1, col:col + rock.width] += rock.sprite
+                    cycle_detector.check((rock_idx, col, np.argwhere(np.max(c, axis=1))[-1][0] + total_removed), idx)
+                    break
+    except EndOfProblem as e:
+        d, idx, cyc = e.args
+        cyc_height = d[-1][2] - d[-1-cyc][2]
+        cycles, cycles_rest = divmod(1_000_000_000_000 - idx, cyc)
+        height = d[-1][2] + cycles * cyc_height + d[-cyc-1+cycles_rest][2] - d[-cyc][2]
+    else:
+        assert False
+    assert height == dataset.result
