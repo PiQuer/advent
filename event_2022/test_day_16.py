@@ -6,29 +6,39 @@ import networkx as nx
 import re
 from typing import Iterable, Union
 from dataclasses import dataclass
-from itertools import product
+from itertools import product, chain
 from utils import dataset_parametrization, DataSetBase
+import logging
 
 
 @dataclass
 class State:
     minute: int
     pressure: int
-    pos: Union[str, tuple[str, str]]
+    pos: str
     opened: Union[tuple[str], tuple[()]]
-    seen: tuple[str]
 
     def __hash__(self):
         return hash((self.pos, self.opened))
 
     def __eq__(self, other: "State"):
         return self.pos == other.pos and self.opened == other.opened
-
-
-VALVES = set()
+    
+    
+@dataclass
+class State2:
+    minute: int
+    pressure: int
+    pos: tuple[str, str]
+    opened: dict[int, Union[tuple[str], tuple[()]]]
 
 
 class DataSet(DataSetBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.valves = set()
+        self.max = 0
+
     def build_graph(self) -> nx.MultiDiGraph:
         graph = nx.MultiDiGraph()
         for line in self.lines():
@@ -38,19 +48,19 @@ class DataSet(DataSetBase):
             graph.add_edges_from((node, target, {"flow_rate": 0}) for target in targets)
             if flow_rate:
                 graph.add_edge(node, node, flow_rate=int(flow_rate))
-                VALVES.add(node)
+                self.valves.add(node)
         return graph
 
 
 round_1 = dataset_parametrization(day="16", examples=[("", 1651)], result=1559, dataset_class=DataSet)
-round_2 = dataset_parametrization(day="16", examples=[("", 1707)], result=None, dataset_class=DataSet)
+round_2 = dataset_parametrization(day="16", examples=[("", 1707)], result=2191, dataset_class=DataSet)
 
 
 def get_next_candidates(graph: nx.MultiDiGraph, candidates: Iterable[State],
-                        seen: dict[State, int]) -> Iterable[State]:
+                        seen: dict[State, int], dataset: DataSet) -> Iterable[State]:
     result = []
     for c in candidates:
-        if len(c.opened) == len(VALVES) or not c.minute:
+        if len(c.opened) == len(dataset.valves) or not c.minute:
             continue
         next_minute = c.minute - 1
         for nbr in graph[c.pos]:
@@ -58,56 +68,70 @@ def get_next_candidates(graph: nx.MultiDiGraph, candidates: Iterable[State],
             edge = graph[c.pos][nbr][0]
             if (fr := edge['flow_rate']) and nbr not in c.opened:
                 candidate = State(minute=next_minute, pressure=c.pressure + fr * next_minute, pos=nbr,
-                                  opened=tuple(sorted(c.opened + (nbr,))), seen=c.seen)
-            elif nbr != c.pos:
-                candidate = State(minute=next_minute, pressure=c.pressure, pos=nbr, opened=c.opened,
-                                  seen=tuple(sorted(c.seen + (nbr,))))
-            else:
+                                  opened=tuple(sorted(c.opened + (nbr,))))
+            elif nbr == c.pos:
                 continue
+            else:
+                candidate = State(minute=next_minute, pressure=c.pressure, pos=nbr, opened=c.opened)
             if seen.get(candidate, -1) < candidate.pressure:
                 result.append(candidate)
                 seen[candidate] = candidate.pressure
     return result
 
 
-def get_next_candidates2(graph: nx.MultiDiGraph, candidates: Iterable[State], seen: dict[State, int]) \
-        -> Iterable[State]:
+def get_next_candidates2(graph: nx.MultiDiGraph, candidates: Iterable[State2],
+                         globally_seen, personally_seen, dataset: DataSet) -> Iterable[State2]:
     result = []
     for c in candidates:
-        _openend, _seen, _pressure = c.opened, c.seen, c.pressure
-        if len(_openend) == len(VALVES) or not c.minute:
+        if len(c.opened) == len(dataset.valves) or not c.minute:
             continue
         next_minute = c.minute - 1
         for n1, n2 in product(graph[c.pos[0]], graph[c.pos[1]]):
+            _opened, _pressure = c.opened.copy(), c.pressure
             e1, e2 = graph[c.pos[0]][n1][0], graph[c.pos[1]][n2][0]
-            if e1 == e2 and e1['flow_rate']:
+            if n1 == n2 and e1['flow_rate'] and e2['flow_rate']:
                 continue
-            for nbr, e, pos in zip((n1, n2), (e1, e2), c.pos):
-                if (fr := e['flow_rate']) and nbr not in _openend:
-                    _openend = tuple(sorted(_openend + (nbr,)))
+            for player, (nbr, e, pos) in enumerate(zip((n1, n2), (e1, e2), c.pos)):
+                if (fr := e['flow_rate']) and nbr not in chain(_opened[0], _opened[1]):
+                    _opened[player] = tuple(sorted(_opened[player] + (nbr,)))
                     _pressure += fr * next_minute
-                elif nbr != pos:
-                    _seen = tuple(sorted(_seen + (nbr,)))
-                else:
-                    continue
-            candidate = State(minute=next_minute, pressure=_pressure, pos=(n1, n2), opened=_openend, seen=_seen)
-            if seen.get(candidate, -1) < candidate.pressure:
-                result.append(candidate)
-                seen[candidate] = candidate.pressure
-        return result
+            candidate = State2(minute=next_minute, pressure=_pressure, pos=(n1, n2), opened=_opened)
+            globally_seen_key = (tuple(sorted((n1, n2))), tuple(sorted(chain.from_iterable(_opened.values()))))
+            personally_seen_key = [(n, _opened[n[0]]) for n in zip((0, 1), (n1, n2))]
+            if globally_seen.get(globally_seen_key, -1) \
+                    < candidate.pressure and \
+                    personally_seen.get(personally_seen_key[0], -1) < candidate.pressure and \
+                    personally_seen.get(personally_seen_key[1], -1) < candidate.pressure:
+                if candidate.pressure > dataset.max:
+                    dataset.max = candidate.pressure
+                if (dataset.max - candidate.pressure) <= 0.4 * dataset.max:
+                    # Todo: fix this
+                    result.append(candidate)
+                globally_seen[globally_seen_key] = candidate.pressure
+    for c in result:
+        personally_seen[((0, c.pos[0]), c.opened[0])] = c.pressure
+        personally_seen[((1, c.pos[1]), c.opened[1])] = c.pressure
+    return result
 
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSet):
     graph = dataset.build_graph()
-    candidates = [State(minute=30, pos='AA', pressure=0, opened=(), seen=('AA',))]
+    candidates = [State(minute=30, pos='AA', pressure=0, opened=())]
     seen = {candidates[0]: 0}
     while candidates:
-        candidates = get_next_candidates(graph, candidates, seen)
+        candidates = get_next_candidates(graph, candidates, seen, dataset)
     assert max(seen.values()) == dataset.result
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
     graph = dataset.build_graph()
-    candidates = [State(minute=26, pos=('AA', 'AA'), pressure=0, opened=(), seen=('AA',))]
+    candidates = [State2(minute=26, pos=('AA', 'AA'), pressure=0, opened={0: (), 1: ()})]
+    globally_seen = {(('AA', 'AA'), ()): 0}
+    personally_seen = {}
+    while candidates:
+        logging.info(f"{candidates[0].minute}: {len(candidates)}")
+        candidates = get_next_candidates2(graph, candidates, globally_seen, personally_seen, dataset)
+    assert max(globally_seen.values()) == dataset.result
+    pass
