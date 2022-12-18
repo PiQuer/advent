@@ -14,6 +14,7 @@ scipy = { version = "^1.7.3", optional = true }
 more-itertools = "^9.0.0"
 tinyarray = "^1.2.4"
 networkx = "^2.8.8"
+numpy-indexed = "^0.3.5"
 
 [tool.poetry.extras]
 scipy = ["scipy"]
