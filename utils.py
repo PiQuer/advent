@@ -1,4 +1,4 @@
-from typing import Sequence, Any, Iterator, Union, Optional
+from typing import Sequence, Any, Iterable, Union, Optional
 from pathlib import Path
 from dataclasses import dataclass
 from itertools import product
@@ -42,32 +42,52 @@ def dataset_parametrization(day: str, examples: Sequence[tuple[str, Any]], resul
     return {'argnames': "dataset", 'argvalues': examples + [puzzle], 'ids': lambda x: x.id}
 
 
-def grid() -> Iterator[tuple[int, int]]:
+def grid() -> Iterable[tuple[int, int]]:
     return (a for a in product((-1, 0, 1), repeat=2))
 
 
-def adjacent_with_diag() -> Iterator[tuple[int, int]]:
+def grid_3d() -> Iterable[tuple[int, int, int]]:
+    return (a for a in product((-1, 0, 1), repeat=3))
+
+
+def adjacent_with_diag() -> Iterable[tuple[int, int]]:
     return (a for a in grid() if a != (0, 0))
 
 
-def adjacent() -> Iterator[tuple[int, int]]:
+def adjacent_with_diag_3d() -> Iterable[tuple[int, int, int]]:
+    return (a for a in grid_3d() if a != (0, 0, 0))
+
+
+def adjacent() -> Iterable[tuple[int, int]]:
     return (a for a in adjacent_with_diag() if abs(a[0]) != abs(a[1]))
 
 
-def np_grid() -> Iterator[np.array]:
+def adjacent_3d() -> Iterable[tuple[int, int, int]]:
+    return (a for a in adjacent_with_diag_3d() if sum(map(abs, a)) == 1)
+
+
+def np_grid() -> Iterable[np.array]:
     return (np.array(a) for a in grid())
 
 
-def np_adjacent_with_diag() -> Iterator[np.array]:
+def np_adjacent_with_diag() -> Iterable[np.array]:
     return (np.array(a) for a in adjacent_with_diag())
 
 
-def np_adjacent() -> Iterator[np.array]:
+def np_adjacent() -> Iterable[np.array]:
     return (np.array(a) for a in adjacent())
 
 
-def ta_adjacent() -> Iterator[ta.array]:
+def ta_adjacent() -> Iterable[ta.array]:
     return (ta.array(a) for a in adjacent())
+
+
+def ta_adjacent_with_diag_3d() -> Iterable[ta.array]:
+    return map(ta.array, adjacent_with_diag_3d())
+
+
+def ta_adjacent_3d() -> Iterable[ta.array]:
+    return map(ta.array, adjacent_3d())
 
 
 def directions() -> dict[str, tuple[int, int]]:
