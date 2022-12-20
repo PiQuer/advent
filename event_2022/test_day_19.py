@@ -1,14 +1,16 @@
 """
 https://adventofcode.com/2022/day/19
 """
-from itertools import starmap, combinations, pairwise, chain
-from operator import le
+from functools import partial, reduce
+from itertools import starmap, combinations, pairwise, chain, islice
+from operator import le, mul
 from typing import Iterator
 import pytest
 import tinyarray as ta
 import re
 from dataclasses import dataclass
 import logging
+
 from utils import dataset_parametrization, DataSetBase
 
 
@@ -34,7 +36,6 @@ class Inventory:
                 result.robots += (0,)*idx + (1,) + (0,)*(3-idx)
                 idx = next(idx_it, 3)
             result.resources += inc
-            # logging.debug("Minute: %d, Inventory: %s", minute, self)
         return result, target_robots
 
     def __le__(self, other: "Inventory"):
@@ -62,6 +63,7 @@ class DataSet(DataSetBase):
 
 
 round_1 = dataset_parametrization(day="19", examples=[("", 33)], result=790, dataset_class=DataSet)
+round_2 = dataset_parametrization(day="19", examples=[("", 56 * 62)], result=7350, dataset_class=DataSet)
 
 
 def irregularity(target_robots: tuple[int, ...], irregularities: int, max_len: int):
@@ -83,15 +85,25 @@ def generate_target_robots(max_len=24, max_irregular=2):
              if g.index(1) < g.index(2) < g.index(3))
 
 
-def quality_level(blueprint: Blueprint) -> int:
+def max_geodes(blueprint: Blueprint, minutes: int = 24, tr_len: int = 20, ir: int = 3) -> int:
     inv = Inventory()
-    target_robots = generate_target_robots(20, 3)
-    stack = [inv.advance(tr, blueprint) for tr in target_robots]
+    target_robots = generate_target_robots(tr_len, ir)
+    stack = [inv.advance(tr, blueprint, minutes) for tr in target_robots]
     max_g = max(stack, key=lambda x: x[0].resources[-1])
     logging.info("bp_id: %d, max: %s, target_robots: %s", blueprint.bp_id, max_g[0], max_g[1])
-    return blueprint.bp_id * max_g[0].resources[-1]
+    return max_g[0].resources[-1]
+
+
+def quality_level(blueprint: Blueprint, minutes: int = 24, tr_len: int = 20, ir: int = 3) -> int:
+    return max_geodes(blueprint, minutes, tr_len, ir) * blueprint.bp_id
 
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSet):
-    assert sum(map(quality_level, dataset.blueprints())) == dataset.result
+    assert sum(map(partial(quality_level, tr_len=16, ir=2), dataset.blueprints())) == dataset.result
+
+
+@pytest.mark.parametrize(**round_2)
+def test_round_2(dataset: DataSet):
+    assert reduce(mul, map(partial(max_geodes, tr_len=23, ir=4, minutes=32), islice(dataset.blueprints(), 3))) \
+        == dataset.result
