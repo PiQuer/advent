@@ -39,6 +39,7 @@ def next_candidates(length: int, candidates: Iterable[ta.array], seen: defaultdi
         return True
     return peekable(starmap(add, filter(valid_next, product(adjacent, candidates))))
 
+
 def path_finder(heightmap: ta.array, start: ta.array, target: ta.array) \
         -> ShortestPath:
     seen = defaultdict(lambda: Waypoint(length=math.inf, previous=None))

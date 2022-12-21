@@ -19,6 +19,7 @@ round_2 = dataset_parametrization(day="01", examples=[("", 45000)], result=19680
 
 class Base:
     top: int
+
     def test_with_sort(self, dataset: DataSet):
         return sum(sorted(dataset.lines())[-self.top:])
 
