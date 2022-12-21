@@ -2,12 +2,11 @@
 https://adventofcode.com/2022/day/21
 """
 from functools import partial
-
 import pytest
 import networkx as nx
 import re
 from operator import add, sub, mul, ifloordiv
-from typing import Callable, Optional
+from typing import Callable
 from utils import dataset_parametrization, DataSetBase
 
 
@@ -47,15 +46,12 @@ def evaluate(node: str, graph: nx.MultiDiGraph):
     return graph.nodes[node]["operator"](*map(partial(evaluate, graph=graph), graph[node]))
 
 
-def get_target(node: str, graph: nx.MultiDiGraph, value: Optional[int] = None, ancestors: Optional[set[str]] = None,
-               target: str = "humn"):
+def get_target(node: str, graph: nx.MultiDiGraph, value: int, ancestors: set[str], target: str = "humn"):
     if node == target:
         return value
-    ancestors = set(nx.ancestors(graph, target)) | {target} if ancestors is None else ancestors
     keys = tuple(graph[node])
     idx = 0 if keys[0] in ancestors else 1
-    value = evaluate(keys[1-idx], graph) if value is None else \
-        inverse[idx][graph.nodes[node]["operator"]](value, evaluate(keys[1-idx], graph))
+    value = inverse[idx][graph.nodes[node]["operator"]](value, evaluate(keys[1-idx], graph))
     return get_target(keys[idx], graph, value, ancestors)
 
 
@@ -68,4 +64,5 @@ def test_round_1(dataset: DataSet):
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
     graph = dataset.graph()
-    assert get_target("root", graph) == dataset.result
+    graph.nodes["root"]["operator"] = sub
+    assert get_target("root", graph, 0, nx.ancestors(graph, "humn") | {"humn"}) == dataset.result
