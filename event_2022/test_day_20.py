@@ -85,7 +85,7 @@ class LinkedList:
 def test_round_1(dataset: DataSetBase):
     linked_list = LinkedList(map(Node, map(int, dataset.lines())))
     consume(map(linked_list.mix, range(len(linked_list))))
-    assert linked_list[1000].value + linked_list[2000].value + linked_list[3000].value == dataset.result
+    assert sum(map(lambda x: linked_list[x * 1000].value, (1, 2, 3))) == dataset.result
 
 
 @pytest.mark.parametrize(**round_2)
@@ -93,4 +93,4 @@ def test_round_2(dataset: DataSetBase):
     linked_list = LinkedList(map(Node, map(partial(mul, 811589153), map(int, dataset.lines()))))
     for _ in range(10):
         consume(map(linked_list.mix, range(len(linked_list))))
-    assert linked_list[1000].value + linked_list[2000].value + linked_list[3000].value == dataset.result
+    assert sum(map(lambda x: linked_list[x * 1000].value, (1, 2, 3))) == dataset.result

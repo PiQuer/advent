@@ -9,7 +9,7 @@ round_2 = dataset_parametrization(day="06", examples=[("1", 19), ("2", 23), ("3"
 
 
 def start_of(input_string: str, num_unique: int):
-    return next(k for k in range(num_unique, len(input_string) + 1)
+    return next(k for k in range(num_unique, len(input_string))
                 if len(set(input_string[k-num_unique:k])) == num_unique)
 
 
