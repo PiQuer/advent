@@ -18,7 +18,7 @@ class DataSetBase:
     def text(self) -> str:
         return self.input_file.read_text()
 
-    def separated_by_empty_line(self):
+    def separated_by_empty_line(self) -> list[str]:
         return self.input_file.read_text().split("\n\n")
 
     def np_array(self, dtype=np.int32) -> np.array:
