@@ -98,8 +98,12 @@ def np_directions() -> dict[str, np.array]:
     return dict(zip(('l', 'u', 'd', 'r'), np_adjacent()))
 
 
-def ta_directions() -> dict[str, ta.array]:
-    return dict(zip(('l', 'u', 'd', 'r'), ta_adjacent()))
+def ta_directions(chars=('l', 'u', 'd', 'r')) -> dict[str, ta.array]:
+    return dict(zip(chars, ta_adjacent()))
+
+
+def ta_directions_arrows() -> dict[str, ta.array]:
+    return ta_directions(chars=('^', '<', '>', 'v'))
 
 
 @dataclass
