@@ -46,13 +46,15 @@ class DataSet(DataSetBase):
         return filter(bool, starmap(partial(self.get_interval, y=y), zip(self.sensors, self.beacons)))
 
 
-round_1 = dataset_parametrization(day="15", examples=[("", 26)], result=4811413, dataset_class=DataSet)
-round_2 = dataset_parametrization(day="15", examples=[("", 56000011)], result=13171855019123, dataset_class=DataSet)
+round_1 = dataset_parametrization(day="15", examples=[("", 26, {'y': 10})], result=4811413, dataset_class=DataSet,
+                                  y=2_000_000)
+round_2 = dataset_parametrization(day="15", examples=[("", 56000011, {'bound': 20})], result=13171855019123,
+                                  dataset_class=DataSet, bound=4_000_000)
 
 
 @pytest.mark.parametrize(**round_1)
-def test_round_1(request, dataset: DataSet):
-    y = 10 if "example" in request.node.name else 2_000_000
+def test_round_1(dataset: DataSet):
+    y = dataset.params["y"]
     intervals = sorted(dataset.intervals(y=y), key=lambda x: x[0])
     consume(starmap(intersect, pairwise(intervals)))
     assert sum(map(i_len, intervals)) - len({b for b in dataset.beacons if b[1] == y}) == dataset.result
@@ -70,10 +72,9 @@ def key_fn(x: list[int]):
 
 
 @pytest.mark.parametrize(**round_2)
-def test_round_2(request, dataset: DataSet):
-    bound = 20 if "example" in request.node.name else 4_000_000
+def test_round_2(dataset: DataSet):
+    bound = dataset.params["bound"]
     y = 0
-
     try:
         consume(map(consume, map(partial(starmap, partial(intersect_and_check, bound=bound)),
                                  map(pairwise, map(partial(sorted, key=key_fn),

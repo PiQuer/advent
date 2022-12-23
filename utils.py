@@ -1,6 +1,6 @@
 from typing import Sequence, Any, Iterable, Union, Optional
 from pathlib import Path
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import product
 import numpy as np
 import tinyarray as ta
@@ -11,6 +11,7 @@ class DataSetBase:
     input_file: Path
     result: Any
     id: str
+    params: dict[Any, Any] = field(default_factory=dict)
 
     def lines(self) -> list[str]:
         return self.input_file.read_text().splitlines()
@@ -33,12 +34,14 @@ class DataSetBase:
 
 
 # noinspection PyArgumentList
-def dataset_parametrization(day: str, examples: Sequence[tuple[str, Any]], result: Any,
-                            dataset_class: type[DataSetBase] = DataSetBase):
+def dataset_parametrization(day: str, examples: Sequence[tuple[Any, ...]], result: Any,
+                            dataset_class: type[DataSetBase] = DataSetBase, **kwargs):
     examples = [dataset_class(input_file=Path(f"input/day_{day}_example{example[0]}.txt"),
                               result=example[1],
-                              id=f"example{example[0]}") for example in examples]
-    puzzle = dataset_class(input_file=Path(f"input/day_{day}.txt"), result=result, id="puzzle")
+                              id=f"example{example[0]}",
+                              params=dict(kwargs, **(example[-1] if len(example) == 3 else {})))
+                for example in examples]
+    puzzle = dataset_class(input_file=Path(f"input/day_{day}.txt"), result=result, id="puzzle", params=kwargs)
     return {'argnames': "dataset", 'argvalues': examples + [puzzle], 'ids': lambda x: x.id}
 
 

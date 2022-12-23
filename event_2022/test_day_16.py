@@ -1,5 +1,6 @@
 """
 https://adventofcode.com/2022/day/16
+TODO: too slow
 """
 import pytest
 import networkx as nx

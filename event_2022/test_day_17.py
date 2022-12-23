@@ -34,8 +34,9 @@ rocks = (
 )
 
 
-round_1 = dataset_parametrization(day="17", examples=[("", 3068)], result=3137)
-round_2 = dataset_parametrization(day="17", examples=[("", 1_514_285_714_288)], result=1_564_705_882_327)
+round_1 = dataset_parametrization(day="17", examples=[("", 3068)], result=3137, rounds=2022)
+round_2 = dataset_parametrization(day="17", examples=[("", 1_514_285_714_288)], result=1_564_705_882_327,
+                                  rounds=1_000_000_000_000)
 
 
 def visualize(c: np.array):
@@ -65,9 +66,8 @@ class EndOfProblem(Exception):
     pass
 
 
+# noinspection PyMethodMayBeStatic
 class BaseDay17:
-    rounds: int
-
     def test_day_17(self, dataset: DataSetBase):
         jet_it = map(lambda x: {'>': 1, '<': -1}[x], cycle(dataset.text()))
         rock_it = cycle(rocks)
@@ -98,7 +98,7 @@ class BaseDay17:
                         break
         except EndOfProblem as e:
             h_cycle, idx, current_height = e.args
-            cycles, rest = divmod(self.rounds - idx - 1, len(h_cycle))
+            cycles, rest = divmod(dataset.params["rounds"] - idx - 1, len(h_cycle))
             height = current_height + sum(h_cycle) * cycles + sum(islice(h_cycle, rest))
         else:
             assert False
@@ -107,9 +107,9 @@ class BaseDay17:
 
 @pytest.mark.parametrize(**round_1)
 class TestRound1(BaseDay17):
-    rounds = 2022
+    pass
 
 
 @pytest.mark.parametrize(**round_2)
 class TestRound2(BaseDay17):
-    rounds = 1_000_000_000_000
+    pass

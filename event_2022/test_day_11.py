@@ -90,29 +90,29 @@ class DataSet2(DataSet):
         return Monkey2(*args, **kwargs)
 
     def _wl(self, wl_str):
-        return ({p: wl%p for p in self.primes} for wl in (int(x) for x in wl_str.split(', ')))
+        return ({p: wl % p for p in self.primes} for wl in (int(x) for x in wl_str.split(', ')))
 
 
-round_1 = dataset_parametrization(day="11", examples=[("", 10605)], result=55216, dataset_class=DataSet)
-round_2 = dataset_parametrization(day="11", examples=[("", 2713310158)], result=12848882750, dataset_class=DataSet2)
+round_1 = dataset_parametrization(day="11", examples=[("", 10605)], result=55216, dataset_class=DataSet, rounds=20)
+round_2 = dataset_parametrization(day="11", examples=[("", 2713310158)], result=12848882750, dataset_class=DataSet2,
+                                  rounds=10000)
 
 
 # noinspection PyMethodMayBeStatic
 class Day11Base:
-    rounds: int
-
     def test_puzzle(self, dataset: DataSet):
         monkeys = dataset.monkeys()
-        for _ in range(self.rounds):
+        for _ in range(dataset.params["rounds"]):
             for m_id in monkeys:
                 monkeys[m_id].throw(monkeys)
         assert mul(*sorted(m.activity for m in monkeys.values())[-2:]) == dataset.result
 
+
 @pytest.mark.parametrize(**round_1)
 class TestRound1(Day11Base):
-    rounds = 20
+    pass
 
 
 @pytest.mark.parametrize(**round_2)
 class TestRound2(Day11Base):
-    rounds = 10000
+    pass

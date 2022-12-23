@@ -1,5 +1,6 @@
 """
 https://adventofcode.com/2022/day/19
+TODO: not a general solution, and too slow
 """
 from functools import partial, reduce
 from itertools import starmap, combinations, pairwise, chain, islice

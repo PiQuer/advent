@@ -12,8 +12,8 @@ class DataSet(DataSetBase):
             yield from repeat(d[line[0].lower()], int(line[2:]))
 
 
-round_1 = dataset_parametrization(day="09", examples=[("1", 13)], result=5513, dataset_class=DataSet)
-round_2 = dataset_parametrization(day="09", examples=[("1", 1), ("2", 36)], result=2427, dataset_class=DataSet)
+round_1 = dataset_parametrization(day="09", examples=[("1", 13)], result=5513, dataset_class=DataSet, len=2)
+round_2 = dataset_parametrization(day="09", examples=[("1", 1), ("2", 36)], result=2427, dataset_class=DataSet, len=10)
 
 
 def update_pos(head: ta.array, tail: ta.array):
@@ -24,11 +24,10 @@ def update_pos(head: ta.array, tail: ta.array):
     return tail
 
 
+# noinspection PyMethodMayBeStatic
 class Day09:
-    length = 0
-
     def test_puzzle(self, dataset: DataSet):
-        pos = [ta.array((0, 0), int) for _ in range(self.length)]
+        pos = [ta.array((0, 0), int) for _ in range(dataset.params["len"])]
         seen = {pos[-1]}
         for d in dataset.directions():
             pos[0] += d
@@ -39,9 +38,9 @@ class Day09:
 
 @pytest.mark.parametrize(**round_1)
 class TestRound1(Day09):
-    length = 2
+    pass
 
 
 @pytest.mark.parametrize(**round_2)
 class TestRound2(Day09):
-    length = 10
+    pass

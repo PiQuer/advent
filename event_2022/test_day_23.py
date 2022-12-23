@@ -55,10 +55,10 @@ round_2 = dataset_parametrization(day="23", examples=[("1", 20)], result=1021, d
 def move(board: set[ta.array], try_list: deque[ta.array]) -> bool:
     proposed_moves = defaultdict(lambda: [])
     changed = False
-    for elve in board:
-        nm = neighbors(elve, board)
+    for elf in board:
+        nm = neighbors(elf, board)
         if 0 < quantify(nm.values()) < 4:
-            proposed_moves[elve + first(lstrip(try_list, lambda t: nm[t]))].append(elve)
+            proposed_moves[elf + first(lstrip(try_list, lambda t: nm[t]))].append(elf)
     for pm in (_ for _ in proposed_moves if len(proposed_moves[_]) == 1):
         board.remove(proposed_moves[pm][0])
         board.add(pm)

@@ -152,7 +152,8 @@ puzzle_edge_wraps = {
 }
 
 
-round_2 = dataset_parametrization(day="22", examples=[("", 5031)], result=184106, dataset_class=DataSet)
+round_2 = dataset_parametrization(day="22", examples=[("", 5031, {'edge_wrap': puzzle_edge_wraps["example"]})],
+                                  result=184106, dataset_class=DataSet, edge_wrap=puzzle_edge_wraps["puzzle"])
 
 
 def step_iterator(pos: ta.array, graph: nx.MultiDiGraph, facing: str) -> Iterator[ta.array]:
@@ -171,9 +172,9 @@ def walk_round_2(pos: ta.array, graph: nx.MultiDiGraph, instr: tuple[str, int], 
 
 
 @pytest.mark.parametrize(**round_2)
-def test_round_2(request, dataset: DataSet):
+def test_round_2(dataset: DataSet):
     board, _ = dataset.board()
-    graph, pos = dataset.graph(puzzle_edge_wraps["example" if "example" in request.node.name else "puzzle"])
+    graph, pos = dataset.graph(dataset.params["edge_wrap"])
     facing = ">"
     for instr in dataset.instructions():
         pos, facing = walk_round_2(pos, graph, instr, facing)
