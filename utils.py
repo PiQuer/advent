@@ -81,8 +81,8 @@ def np_adjacent() -> Iterable[np.array]:
     return (np.array(a) for a in adjacent())
 
 
-def ta_adjacent() -> Iterable[ta.array]:
-    return (ta.array(a) for a in adjacent())
+def ta_adjacent(pos: ta.array = ta.array((0, 0))) -> Iterable[ta.array]:
+    return (pos + ta.array(a) for a in adjacent())
 
 
 def ta_adjacent_with_diag_3d() -> Iterable[ta.array]:
