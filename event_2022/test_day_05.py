@@ -1,7 +1,6 @@
-import pytest
 from collections import defaultdict
 from itertools import takewhile, islice
-from utils import dataset_parametrization, DataSetBase
+from utils import dataset_parametrization, DataSetBase, generate_rounds
 
 
 class DataSet(DataSetBase):
@@ -18,29 +17,17 @@ class DataSet(DataSetBase):
             yield tuple(int(c) for c in line.split(' ') if c.isdigit())
 
 
-round_1 = dataset_parametrization("05", examples=[("", "CMZ")], result="SHMSDGZVC", dataset_class=DataSet, model=9000)
-round_2 = dataset_parametrization("05", examples=[("", "MCD")], result="VRZGHDFBQ", dataset_class=DataSet, model=9001)
+round_1 = dataset_parametrization("05", examples=[("", "CMZ")], result="SHMSDGZVC", dataset_class=DataSet,
+                                  slice=lambda num: slice(-1, -(num+1), -1))
+round_2 = dataset_parametrization("05", examples=[("", "MCD")], result="VRZGHDFBQ", dataset_class=DataSet,
+                                  slice=lambda num: slice(-num, None))
+pytest_generate_tests = generate_rounds(round_1, round_2)
 
 
-# noinspection PyMethodMayBeStatic
-class Day05Base:
-    def test_restack(self, dataset: DataSet):
-        it = dataset.preprocessed_lines()
-        stack = next(it)
-        for num, f, t in it:
-            if dataset.params["model"] == 9000:
-                stack[t].extend(stack[f][-1:-(num+1):-1])
-            else:
-                stack[t].extend(stack[f][-num:])
-            del(stack[f][-num:])
-        assert ''.join(stack[k][-1] for k in stack.keys()) == dataset.result
-
-
-@pytest.mark.parametrize(**round_1)
-class TestRound1(Day05Base):
-    pass
-
-
-@pytest.mark.parametrize(**round_2)
-class TestRound2(Day05Base):
-    pass
+def test_day_5(dataset: DataSet):
+    it = dataset.preprocessed_lines()
+    stack = next(it)
+    for num, f, t in it:
+        stack[t].extend(stack[f][dataset.params['slice'](num)])
+        del(stack[f][-num:])
+    assert ''.join(stack[k][-1] for k in stack.keys()) == dataset.result

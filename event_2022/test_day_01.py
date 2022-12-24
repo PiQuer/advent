@@ -1,5 +1,5 @@
-import pytest
-from utils import dataset_parametrization, DataSetBase
+import heapq
+from utils import dataset_parametrization, DataSetBase, generate_rounds
 
 
 class DataSet(DataSetBase):
@@ -7,21 +7,11 @@ class DataSet(DataSetBase):
         yield from map(lambda x: sum(int(s) for s in x.split()), self.separated_by_empty_line())
 
 
-round_1 = dataset_parametrization(day="01", examples=[("", 24000)], result=66186, dataset_class=DataSet, top=1)
-round_2 = dataset_parametrization(day="01", examples=[("", 45000)], result=196804, dataset_class=DataSet, top=3)
+round_1 = dataset_parametrization(day="01", examples=[("", 24000)], result=66186, dataset_class=DataSet, top=max)
+round_2 = dataset_parametrization(day="01", examples=[("", 45000)], result=196804, dataset_class=DataSet,
+                                  top=lambda x: sum(heapq.nlargest(3, x)))
+pytest_generate_tests = generate_rounds(round_1, round_2)
 
 
-# noinspection PyMethodMayBeStatic
-class Base:
-    def test_with_sort(self, dataset: DataSet):
-        return sum(sorted(dataset.calories())[-dataset.params["top"]:])
-
-
-@pytest.mark.parametrize(**round_1)
-class TestRound1(Base):
-    pass
-
-
-@pytest.mark.parametrize(**round_2)
-class TestRound2(Base):
-    pass
+def test_day_1(dataset: DataSet):
+    assert dataset.params["top"](dataset.calories()) == dataset.result

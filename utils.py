@@ -114,3 +114,11 @@ class Waypoint:
     length: Union[int, float]
     previous: Optional[Union[tuple[int, int], ta.array]]
     value: Optional[Any] = None
+
+
+def generate_rounds(round_1: dict, round_2: dict):
+    def pytest_generate_tests_template(metafunc):
+        if "dataset" in metafunc.fixturenames:
+            metafunc.parametrize("dataset", argvalues=round_1['argvalues'] + round_2['argvalues'],
+                                 ids=lambda x: ("round1_" if x in round_1['argvalues'] else "round2_") + x.id)
+    return pytest_generate_tests_template

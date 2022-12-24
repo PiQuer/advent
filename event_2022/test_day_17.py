@@ -1,17 +1,14 @@
 """
 https://adventofcode.com/2022/day/17
 """
-import pytest
 import tinyarray as ta
 import numpy as np
 from itertools import cycle, islice
 from dataclasses import dataclass
 from collections import deque
 import logging
-
 from more_itertools import always_reversible
-
-from utils import dataset_parametrization, DataSetBase
+from utils import dataset_parametrization, DataSetBase, generate_rounds
 
 
 @dataclass
@@ -37,6 +34,7 @@ rocks = (
 round_1 = dataset_parametrization(day="17", examples=[("", 3068)], result=3137, rounds=2022)
 round_2 = dataset_parametrization(day="17", examples=[("", 1_514_285_714_288)], result=1_564_705_882_327,
                                   rounds=1_000_000_000_000)
+pytest_generate_tests = generate_rounds(round_1, round_2)
 
 
 def visualize(c: np.array):
@@ -66,50 +64,38 @@ class EndOfProblem(Exception):
     pass
 
 
-# noinspection PyMethodMayBeStatic
-class BaseDay17:
-    def test_day_17(self, dataset: DataSetBase):
-        jet_it = map(lambda x: {'>': 1, '<': -1}[x], cycle(dataset.text()))
-        rock_it = cycle(rocks)
-        c = np.ones((1, 7), dtype=int)
-        cycle_detector = CycleDetector(1000)
-        last_height = 0
-        try:
-            for idx, rock in enumerate(rock_it):
-                if idx % 1000 == 0:
-                    logging.info("Index: %d", idx)
-                row = np.argwhere(np.max(c, axis=1))[-1][0] + 3 + rock.height
-                col = 2
-                if (append := row - c.shape[0] + 1) > 0:
-                    c = np.concatenate([c, np.zeros((append, c.shape[1]), dtype=int)], axis=0)
-                for jet in jet_it:
-                    if 0 <= col + jet <= c.shape[1] - rock.width:
-                        if not np.any(
-                                np.logical_and(c[row-rock.height+1:row+1, col+jet:col+jet+rock.width], rock.sprite)):
-                            col += jet
-                    if not np.any(np.logical_and(c[row-rock.height:row, col:col+rock.width], rock.sprite)):
-                        row -= 1
-                    else:
-                        c[row - rock.height + 1:row + 1, col:col + rock.width] += rock.sprite
-                        dh = (height := np.argwhere(np.max(c, axis=1))[-1][0]) - last_height
-                        last_height = height
-                        if idx > 1000:
-                            cycle_detector.check(dh, idx, height)
-                        break
-        except EndOfProblem as e:
-            h_cycle, idx, current_height = e.args
-            cycles, rest = divmod(dataset.params["rounds"] - idx - 1, len(h_cycle))
-            height = current_height + sum(h_cycle) * cycles + sum(islice(h_cycle, rest))
-        else:
-            assert False
-        assert height == dataset.result
-
-
-@pytest.mark.parametrize(**round_1)
-class TestRound1(BaseDay17):
-    pass
-
-
-@pytest.mark.parametrize(**round_2)
-class TestRound2(BaseDay17):
-    pass
+def test_day_17(dataset: DataSetBase):
+    jet_it = map(lambda x: {'>': 1, '<': -1}[x], cycle(dataset.text()))
+    rock_it = cycle(rocks)
+    c = np.ones((1, 7), dtype=int)
+    cycle_detector = CycleDetector(1000)
+    last_height = 0
+    try:
+        for idx, rock in enumerate(rock_it):
+            if idx % 1000 == 0:
+                logging.info("Index: %d", idx)
+            row = np.argwhere(np.max(c, axis=1))[-1][0] + 3 + rock.height
+            col = 2
+            if (append := row - c.shape[0] + 1) > 0:
+                c = np.concatenate([c, np.zeros((append, c.shape[1]), dtype=int)], axis=0)
+            for jet in jet_it:
+                if 0 <= col + jet <= c.shape[1] - rock.width:
+                    if not np.any(
+                            np.logical_and(c[row-rock.height+1:row+1, col+jet:col+jet+rock.width], rock.sprite)):
+                        col += jet
+                if not np.any(np.logical_and(c[row-rock.height:row, col:col+rock.width], rock.sprite)):
+                    row -= 1
+                else:
+                    c[row - rock.height + 1:row + 1, col:col + rock.width] += rock.sprite
+                    dh = (height := np.argwhere(np.max(c, axis=1))[-1][0]) - last_height
+                    last_height = height
+                    if idx > 1000:
+                        cycle_detector.check(dh, idx, height)
+                    break
+    except EndOfProblem as e:
+        h_cycle, idx, current_height = e.args
+        cycles, rest = divmod(dataset.params["rounds"] - idx - 1, len(h_cycle))
+        height = current_height + sum(h_cycle) * cycles + sum(islice(h_cycle, rest))
+    else:
+        assert False
+    assert height == dataset.result

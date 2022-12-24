@@ -2,12 +2,11 @@
 https://adventofcode.com/2022/day/11
 """
 from typing import Iterable, Callable, Any
-import pytest
 import re
 from collections import deque
 from operator import pow, add, mul
 from more_itertools import partition
-from utils import dataset_parametrization, DataSetBase
+from utils import dataset_parametrization, DataSetBase, generate_rounds
 
 
 class Monkey:
@@ -96,23 +95,12 @@ class DataSet2(DataSet):
 round_1 = dataset_parametrization(day="11", examples=[("", 10605)], result=55216, dataset_class=DataSet, rounds=20)
 round_2 = dataset_parametrization(day="11", examples=[("", 2713310158)], result=12848882750, dataset_class=DataSet2,
                                   rounds=10000)
+pytest_generate_tests = generate_rounds(round_1, round_2)
 
 
-# noinspection PyMethodMayBeStatic
-class Day11Base:
-    def test_puzzle(self, dataset: DataSet):
-        monkeys = dataset.monkeys()
-        for _ in range(dataset.params["rounds"]):
-            for m_id in monkeys:
-                monkeys[m_id].throw(monkeys)
-        assert mul(*sorted(m.activity for m in monkeys.values())[-2:]) == dataset.result
-
-
-@pytest.mark.parametrize(**round_1)
-class TestRound1(Day11Base):
-    pass
-
-
-@pytest.mark.parametrize(**round_2)
-class TestRound2(Day11Base):
-    pass
+def test_day_11(dataset: DataSet):
+    monkeys = dataset.monkeys()
+    for _ in range(dataset.params["rounds"]):
+        for m_id in monkeys:
+            monkeys[m_id].throw(monkeys)
+    assert mul(*sorted(m.activity for m in monkeys.values())[-2:]) == dataset.result
