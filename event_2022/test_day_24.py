@@ -1,7 +1,7 @@
 """
 https://adventofcode.com/2022/day/24
 """
-from functools import cached_property, reduce
+from functools import cached_property, reduce, partial
 from itertools import chain, pairwise
 from typing import Optional, Iterator
 import pytest
@@ -9,9 +9,9 @@ import numpy as np
 import tinyarray as ta
 from dataclasses import dataclass
 import heapq
-from more_itertools import consume
+from operator import add, sub
 
-from utils import dataset_parametrization, DataSetBase, ta_adjacent
+from utils import dataset_parametrization, DataSetBase, ta_adjacent, inbounds
 
 
 class DataSet(DataSetBase):
@@ -24,7 +24,7 @@ round_1 = dataset_parametrization(day="24", examples=[("", 18)], result=286, dat
 round_2 = dataset_parametrization(day="24", examples=[("", 54)], result=820, dataset_class=DataSet)
 
 
-@dataclass
+@dataclass(frozen=True)
 class Item:
     pos: ta.array
     step: int
@@ -34,14 +34,8 @@ class Item:
     def distance(self) -> int:
         return sum(ta.abs(self.target - self.pos))
 
-    def __hash__(self):
-        return hash((self.pos, self.step))
-
-    def __eq__(self, other):
-        return self.pos == other.pos and self.step == other.step
-
     def __lt__(self, other: "Item"):
-        return self.distance < other.distance or (self.distance == other.distance and self.step < other.step)
+        return (self.distance, self.step) < (other.distance, other.step)
 
 
 def is_free(pos: ta.array, board: np.array, state: int):
@@ -52,47 +46,22 @@ def next_step(pq: list, start: ta.array, target: ta.array, board: np.array, seen
     item: Item = heapq.heappop(pq)
     if shortest and item.step + sum(ta.abs(target - item.pos)) >= shortest:
         return shortest
-    for next_pos in chain(ta_adjacent(item.pos), (item.pos,)):
-        if next_pos == target:
-            shortest = item.step + 1
-            break
-        if min(next_pos) < 0 or max(next_pos - board.shape) >= 0:
-            if not (next_pos == item.pos and next_pos == start):  # allow to wait at the start position
-                # but do not allow to enter the start position again
-                continue
-        if next_pos == start or is_free(next_pos, board, item.step + 1):
-            next_item = Item(pos=next_pos, step=item.step+1, target=target)
-            if next_item not in seen and \
-                    (shortest is None or next_item.step + next_item.distance < shortest):
+    elif item.distance == 1:
+        return item.step + 1
+    for next_pos in chain(filter(partial(inbounds, board.shape), ta_adjacent(item.pos)), (item.pos,)):
+        if (next_item := Item(pos=next_pos, step=item.step + 1, target=target)) not in seen:
+            if next_item.pos == start or is_free(next_item.pos, board, next_item.step):
                 seen.add(next_item)
                 heapq.heappush(pq, next_item)
     return shortest
 
 
-def blizzards(board: np.array, pos: ta.array, state: int) -> Iterator[str]:
+def blizzards(board: np.array, pos: ta.array, state: int) -> Iterator[bytes]:
     rows, columns = board.shape
-    if board[(pos[0] - state) % rows, pos[1]] == b'v':
-        yield 'v'
-    if board[(pos[0] + state) % rows, pos[1]] == b'^':
-        yield '^'
-    if board[pos[0], (pos[1] - state) % columns] == b'>':
-        yield '>'
-    if board[pos[0], (pos[1] + state) % columns] == b'<':
-        yield '<'
-
-
-def visualize(board: np.array, state: int, current: Optional[ta.array] = None):
-    result = np.full_like(board, '.', dtype='U1')
-    rows, columns = result.shape
-    for pos in np.ndindex(rows, columns):
-        blist = list(blizzards(board, pos, state))
-        if len(blist) == 1:
-            result[pos] = blist[0]
-        if len(blist) > 1:
-            result[pos] = str(len(blist)) if len(blist) < 9 else '+'
-    if current is not None:
-        result[tuple(current)] = 'E'
-    consume(map(print, (''.join(row) for row in result)))
+    b = {b'v': (0, sub), b'^': (0, add), b'>': (1, sub), b'<': (1, add)}
+    yield from filter(
+        lambda x: board[((b[x][1](pos[0], state) % rows) if b[x][0] == 0 else pos[0],
+                         (b[x][1](pos[1], state) % columns) if b[x][0] == 1 else pos[1])] == x, b)
 
 
 def propagate(step: int, board: np.array, start: ta.array, target: ta.array):

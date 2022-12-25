@@ -122,3 +122,7 @@ def generate_rounds(round_1: dict, round_2: dict):
             metafunc.parametrize("dataset", argvalues=round_1['argvalues'] + round_2['argvalues'],
                                  ids=lambda x: ("round1_" if x in round_1['argvalues'] else "round2_") + x.id)
     return pytest_generate_tests_template
+
+
+def inbounds(shape: ta.array, pos: ta.array) -> bool:
+    return max(pos - shape) < 0 <= min(pos)
