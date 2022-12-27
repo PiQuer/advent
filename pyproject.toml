@@ -19,7 +19,7 @@ numpy-indexed = "^0.3.5"
 [tool.poetry.extras]
 scipy = ["scipy"]
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest-pycharm = "^0.7.0"
 pytest-profiling = "^1.7.0"
 
