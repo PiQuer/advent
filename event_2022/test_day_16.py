@@ -5,7 +5,7 @@ TODO: too slow
 import pytest
 import networkx as nx
 import re
-from typing import Iterable, Union
+from typing import Iterable, Union, Optional
 from dataclasses import dataclass
 from itertools import product, chain
 from utils import dataset_parametrization, DataSetBase
@@ -32,6 +32,11 @@ class State2:
     pressure: int
     pos: tuple[str, str]
     opened: dict[int, Union[tuple[str], tuple[()]]]
+    previous: Optional["State2"] = None
+
+    def __str__(self):
+        return f"minute={self.minute}, pressure={self.pressure}, pos={self.pos}, opened0: {self.opened[0]}" \
+            f" opened1: {self.opened[1]}"
 
 
 class DataSet(DataSetBase):
@@ -39,6 +44,7 @@ class DataSet(DataSetBase):
         super().__init__(*args, **kwargs)
         self.valves = set()
         self.max = 0
+        self.max_state: Optional[State2] = None
 
     def build_graph(self) -> nx.MultiDiGraph:
         graph = nx.MultiDiGraph()
@@ -96,7 +102,7 @@ def get_next_candidates2(graph: nx.MultiDiGraph, candidates: Iterable[State2],
                 if (fr := e['flow_rate']) and nbr not in chain(_opened[0], _opened[1]):
                     _opened[player] = tuple(sorted(_opened[player] + (nbr,)))
                     _pressure += fr * next_minute
-            candidate = State2(minute=next_minute, pressure=_pressure, pos=(n1, n2), opened=_opened)
+            candidate = State2(minute=next_minute, pressure=_pressure, pos=(n1, n2), opened=_opened, previous=c)
             globally_seen_key = (tuple(sorted((n1, n2))), tuple(sorted(chain.from_iterable(_opened.values()))))
             personally_seen_key = [(n, _opened[n[0]]) for n in zip((0, 1), (n1, n2))]
             if globally_seen.get(globally_seen_key, -1) \
@@ -105,6 +111,7 @@ def get_next_candidates2(graph: nx.MultiDiGraph, candidates: Iterable[State2],
                     personally_seen.get(personally_seen_key[1], -1) < candidate.pressure:
                 if candidate.pressure > dataset.max:
                     dataset.max = candidate.pressure
+                    dataset.max_state = candidate
                 if (dataset.max - candidate.pressure) <= 0.4 * dataset.max:
                     # Todo: fix this
                     result.append(candidate)
@@ -122,7 +129,7 @@ def test_round_1(dataset: DataSet):
     seen = {candidates[0]: 0}
     while candidates:
         candidates = get_next_candidates(graph, candidates, seen, dataset)
-    assert max(seen.values()) == dataset.result
+    assert dataset.max == dataset.result
 
 
 @pytest.mark.parametrize(**round_2)
@@ -134,5 +141,8 @@ def test_round_2(dataset: DataSet):
     while candidates:
         logging.info(f"{candidates[0].minute}: {len(candidates)}")
         candidates = get_next_candidates2(graph, candidates, globally_seen, personally_seen, dataset)
-    assert max(globally_seen.values()) == dataset.result
-    pass
+    assert dataset.max == dataset.result
+    state = dataset.max_state
+    while state:
+        logging.info(state)
+        state = state.previous
