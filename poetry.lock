@@ -402,6 +402,18 @@ files = [
 pytest = ">=2.3"
 
 [[package]]
+name = "ratelimitingfilter"
+version = "1.5"
+description = "A rate limiting filter for the Python logging system"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "ratelimitingfilter-1.5-py2.py3-none-any.whl", hash = "sha256:8be579efdbdb49dee755477a9d9c19994ad246a37438a5e2d06d53b4ea4c2c19"},
+    {file = "ratelimitingfilter-1.5.tar.gz", hash = "sha256:1b05934c6de6789c903115542f7f7b9280d12521de3cb3fd66d773c5a12adf15"},
+]
+
+[[package]]
 name = "scipy"
 version = "1.9.3"
 description = "Fundamental algorithms for scientific computing in Python"
@@ -481,4 +493,4 @@ scipy = ["scipy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "a45262c83238666c0c0d8c58968ccab7390b164dfb78a310b8f9561d73b781e0"
+content-hash = "c730e78c56dfb3efc7870a7c74d9be8d54b892d990b861a8677bce2986a6397d"
