@@ -4,3 +4,4 @@ __pycache__
 .benchmarks
 prof
 .python-version
+.pytest_cache
