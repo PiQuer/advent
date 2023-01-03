@@ -1,152 +1,243 @@
-import pytest
+"""
+https://adventofcode.com/2021/day/23
+"""
 from pathlib import Path
+from typing import Optional, Iterator, Any
+import tinyarray as ta
 import numpy as np
-import itertools
-import math
+from itertools import chain, takewhile, islice
+from more_itertools import quantify, first, iterate, always_reversible, rstrip, lstrip
+import heapq
+from dataclasses import dataclass
+from functools import cached_property, cache, partial
+import logging
+from operator import attrgetter, itemgetter, eq
+from collections import defaultdict
+from toolz import complement, count
 
-from event_2021.utils import shift
+from utils import dataset_parametrization, DataSetBase, generate_rounds
 
 
-energies = {'A': 1, 'B': 10, 'C': 100, 'D': 1000}
-home_columns = {'A': 3, 'B': 5, 'C': 7, 'D': 9}
-forbidden = tuple(itertools.product((1,), (c for c in home_columns.values())))
+home_columns = {1: 3, 2: 5, 3: 7, 4: 9}
+hw_penalties = (1, 10, 100, 1000, 100, 10, 1)
 
 
-def get_data(input_file):
-    result = []
-    boards = Path(input_file).read_text().split('\n\n')
-    for board in boards:
-        lines = board.splitlines()
-        result.append(np.array([list(line) + [' ']*(len(lines[0])-len(line)) for line in lines]))
+@dataclass(frozen=True)
+class State:
+    hallway: tuple[int]
+    side_rooms: tuple[tuple[Any, ...]]
+    depth: int
+    energy: int
+    previous: Optional["State"] = None
+
+    @cached_property
+    def hw_penalty(self) -> int:
+        return ta.dot(self.hallway, hw_penalties)
+
+    @cached_property
+    def count_home(self) -> int:
+        return self.depth * 4 - quantify(self.hallway) - self.count_move_twice
+
+    @cached_property
+    def count_move_twice(self):
+        return sum(map(quantify, self.side_rooms))
+
+    def __hash__(self):
+        return hash((self.hallway, self.side_rooms))
+
+    def __eq__(self, other: "State"):
+        return (self.hallway, self.side_rooms) == (other.hallway, other.side_rooms)
+
+    def __lt__(self, other: "State"):
+        return (-self.count_home, self.count_move_twice, self.hw_penalty, self.energy) < \
+            (-other.count_home, other.count_move_twice, other.hw_penalty, other.energy)
+
+
+class DataSet(DataSetBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.params['depth'] == 2:
+            self.debug = self.debug_positions(Path('input') / "day_23_debug_01.txt")
+        if self.params['depth'] == 4:
+            self.debug = self.debug_positions(Path('input') / "day_23_debug_02.txt")
+        self.count = 0
+
+    def debug_positions(self, input_file: Path) -> list[State]:
+        result = []
+        it = iter(input_file.read_text().splitlines())
+        lines = list(islice(it, self.params['depth'] + 3))
+        while lines:
+            result.append(self.get_state(lines))
+            lines = list(islice(it, self.params['depth'] + 3))
+        return result
+
+    def get_state(self, lines: list[str]) -> State:
+        depth = self.params["depth"]
+        a = np.array(list(map(list, map(lambda x: x.replace('.', '@').ljust(13).encode(), lines))), dtype=int)
+        if len(a) == 5 and depth == 4:
+            a = np.concatenate((a, a[-2:]))
+            a[-3] = a[-5]
+            a[3:5] = np.array(list(map(list, (b"  #D#C#B#A#  ", b"  #D#B#A#C#  "))), dtype=int)
+        a -= ord('@')
+        hallway = tuple(a[1, (1, 2, 4, 6, 8, 10, 11)])
+        side_rooms = tuple(tuple(rstrip(a[2:2+depth, home_columns[x]], partial(eq, x))) for x in range(1, 5))
+        return State(hallway=hallway, side_rooms=side_rooms, depth=depth, energy=0)
+
+    def initial_state(self) -> State:
+        return self.get_state(self.lines())
+
+
+def free_hallway(state: State, h_idx: int, s_idx: int, to_side_room=True) -> bool:
+    rightwards = h_idx <= s_idx + 1
+    step = 1 if rightwards else -1
+    s = slice(h_idx + (step if to_side_room else 0), s_idx + (2 if rightwards else 1), step)
+    return not any(state.hallway[s])
+
+
+@cache
+def steps(h_idx: int, s_idx: int) -> int:
+    return abs(2 * (h_idx - s_idx) - 3) - int(h_idx == 0 or h_idx == 6)
+
+
+def next_states_moving_in(state: State, seen: dict[State], h_idx: Optional[int] = None,
+                          previous: Optional[State] = None) -> Iterator[State]:
+    previous = state if previous is None else previous
+    loop = enumerate(state.hallway) if h_idx is None else ((h_idx, state.hallway[h_idx]),)
+    for h_idx, a in loop:
+        s_idx = a - 1
+        if a and not any(state.side_rooms[s_idx]) and free_hallway(state, h_idx, s_idx):
+            new_energy = state.energy + (steps(h_idx, s_idx) + len(state.side_rooms[s_idx])) * 10**s_idx
+            # noinspection PyTypeChecker
+            new_state = State(
+                hallway=state.hallway[:h_idx] + (0,) + state.hallway[h_idx+1:],
+                side_rooms=state.side_rooms[:s_idx] + (state.side_rooms[s_idx][:-1],) + state.side_rooms[a:],
+                energy=new_energy, depth=state.depth, previous=previous)
+            if new_state not in seen or seen[new_state] > new_state.energy:
+                seen[new_state] = new_state.energy
+                yield new_state
+
+
+def next_states_moving_out(state: State, seen: dict[State]) -> Iterator[State]:
+    for s_idx, side_room in enumerate(state.side_rooms):
+        pos, a = first(lstrip(enumerate(side_room), complement(itemgetter(1))), default=(0, 0))
+        if a:
+            try_first = a + int(s_idx >= a)
+            for h_idx in chain((try_first,), range(try_first), range(try_first + 1, 7)):
+                if free_hallway(state, h_idx, s_idx, to_side_room=False):
+                    new_energy = state.energy + (steps(h_idx, s_idx) + pos + 1) * 10**(a-1)
+                    new_side_room = state.side_rooms[s_idx][:pos] + (0,) + state.side_rooms[s_idx][pos+1:]
+                    # noinspection PyTypeChecker
+                    new_state = State(
+                        hallway=state.hallway[:h_idx] + (a,) + state.hallway[h_idx+1:],
+                        side_rooms=state.side_rooms[:s_idx] + (new_side_room,) + state.side_rooms[s_idx+1:],
+                        energy=new_energy, depth=state.depth, previous=state)
+                    if h_idx == try_first:
+                        if (moving_in := first(next_states_moving_in(new_state, seen, h_idx, state), None)) is not None:
+                            yield moving_in
+                            continue
+                    if new_state not in seen or seen[new_state] > new_state.energy:
+                        if not (is_blocked_1(new_state, h_idx) or is_blocked_2(new_state)):
+                            seen[new_state] = new_state.energy
+                            yield new_state
+                        else:
+                            seen[new_state] = 0
+
+
+def lower_bound(state: State) -> int:
+    seen = defaultdict(lambda: 0)
+    result = 0
+    for h_idx, a in enumerate(state.hallway):
+        if a:
+            s_idx = a - 1
+            result += (steps(h_idx, s_idx) + 1 + seen[a]) * 10**s_idx
+            seen[a] += 1
+    for s_idx, side_room in enumerate(state.side_rooms):
+        for pos, a in enumerate(side_room):
+            if a:
+                result += ((pos + 1) + 2 * abs(s_idx - a + 1) + int(s_idx == a - 1) * 2 + (1 + seen[a])) * 10**(a-1)
+                seen[a] += 1
     return result
 
 
-def get_data_part_one(input_file):
-    result = get_data(input_file)
-    return result[0] if len(result) == 1 else result
-
-
-def get_data_part_two(input_file):
-    boards = get_data(input_file)
-    unfold = ("  #D#C#B#A#  ", "  #D#B#A#C#  ")
-    result = []
-    for board in boards:
-        if board.shape[0] == 5:
-            new_data = np.zeros_like(board, shape=(board.shape[0]+2, board.shape[1]))
-            new_data[0:3] = board[0:3]
-            new_data[3:5] = np.array([list(line) for line in unfold])
-            new_data[5:] = board[3:]
-        else:
-            new_data = board
-        result.append(new_data)
-    return result[0] if len(result) == 1 else result
-
-
-def visualize(board, mask=None):
-    if mask is not None:
-        board = np.copy(board)
-        board[np.logical_and(board != '#', ~mask)] = ' '
-    [print(''.join(line)) for line in board]
-
-
-def one_step(start, board: np.array):
-    shifted = np.stack([shift(start, amount=amount, axis=axis, fill=False) for amount in (1, -1) for axis in (0, 1)])
-    return np.logical_and.reduce(np.stack([np.logical_or.reduce(shifted), board == '.', ~start]))
-
-
-def check_blocking(amphipod, board, z1):
-    home1 = home_columns[amphipod]
-    for b in np.isin(board[1], ('A', 'B', 'C', 'D')).nonzero()[0]:
-        home2 = home_columns[board[1, b]]
-        if home1 < b < z1 < home2 or home2 < z1 < b < home1:
+def is_blocked_1(state: State, new_idx) -> bool:
+    a1 = state.hallway[new_idx]
+    for h_idx, a2 in islice(enumerate(state.hallway), 2, 5):
+        if a2 and h_idx != new_idx and (min(a1, a2) < min(h_idx, new_idx) < max(h_idx, new_idx) <= max(a1, a2)):
             return True
     return False
 
 
-def legal_move(amphipod, board, x0, z0, z1):
-    if (z0, z1) in forbidden:
-        return False
-    if z0 == 1 and check_blocking(amphipod, board, z1):
-        return False
-    homerun = z1 == home_columns[amphipod] and np.all(board[z0+1:-1, z1] == amphipod)
-    if x0 == 1:
-        return homerun
-    return z0 == 1 or homerun
+@cache
+def count_available_hallway_spots(h_idx: int, hallway: tuple[int, ...]) -> int:
+    a = hallway[h_idx]
+    s = range(a, -1, -1) if a < h_idx else range(a + 1, 7)
+
+    def _not_blocked(idx: int):
+        if not (b := hallway[idx]):
+            return True
+        return not ((a == b) or (b < h_idx < idx) or (idx < h_idx <= b))
+    return count(takewhile(_not_blocked, s))
 
 
-def find_next_moves(x0, x1, seen, board, energy):
-    amphipod = board[x0, x1]
-    result = []
-    steps = 0
-    current = np.zeros_like(board, dtype=bool)
-    current[x0, x1] = True
-    next_steps = current
-    while next_steps.any():
-        steps += 1
-        next_steps = one_step(current, board)
-        for z0, z1 in zip(*next_steps.nonzero()):
-            if legal_move(amphipod, board, x0, z0, z1):
-                new_board = board.copy()
-                new_board[z0, z1] = board[x0, x1]
-                new_board[x0, x1] = '.'
-                new_board_tuple = to_tuple(new_board)
-                new_energy = energy + steps*energies[amphipod]
-                if new_board_tuple not in seen or seen[new_board_tuple] > new_energy:
-                    result.append((new_board, new_energy))
-                    seen[new_board_tuple] = new_energy
-        current |= next_steps
+def is_blocked_2(state: State) -> bool:
+    for h_idx in range(2, 5):
+        if a := state.hallway[h_idx]:
+            s_idx = a - 1
+            z = quantify(state.side_rooms[s_idx], lambda b: b and (b == a or a < h_idx <= b or b < h_idx <= a))
+            if z > count_available_hallway_spots(h_idx, state.hallway):
+                return True
+    return False
+
+
+def visualize(state: State, print_str: bool = False) -> str:
+    board = b"#############\n#...........#\n###.#.#.#.###" + b"\n  #.#.#.#.#  " * (state.depth - 1) + \
+        b"\n  #########  "
+    board = np.array(list(map(list, board.splitlines())), dtype=np.int8)
+    for col, side_room in enumerate(state.side_rooms):
+        board[2:2+len(side_room), home_columns[col+1]] = ta.array(side_room) + ord('@')
+        board[2+len(side_room):2+state.depth, home_columns[col+1]] = col + 1 + ord('@')
+    board[1, (1, 2, 4, 6, 8, 10, 11)] = ta.array(state.hallway) + ord('@')
+    board = board.view(dtype='S1')
+    board[np.where(board == b'@')] = b'.'
+    result = b'\n'.join(b''.join(line) for line in board).decode()
+    if print_str:
+        print(result)
     return result
 
 
-def free_amphipods(board):
-    amphipods = np.isin(board, ('A', 'B', 'C', 'D')).nonzero()
-    index = np.zeros_like(amphipods[0], dtype=bool)
-    for i, (ax0, ax1) in enumerate(zip(*amphipods)):
-        if ax0 == 1 or ax1 != home_columns[board[ax0, ax1]] or np.any(board[ax0+1:-1, ax1] != board[ax0, ax1]):
-            index[i] = True
-    return amphipods[0][index], amphipods[1][index]
+def evaluate_next(candidates: list[State], seen: dict[State, int], minimum: Optional[State],
+                  dataset: DataSet) -> State:
+    c = heapq.heappop(candidates)
+    dataset.count += 1
+    if c.count_home == c.depth * 4:
+        if minimum is None or c.energy < minimum.energy:
+            return c
+    for next_candidate in chain(next_states_moving_in(c, seen), next_states_moving_out(c, seen)):
+        if minimum is not None and next_candidate.energy + lower_bound(next_candidate) >= minimum.energy:
+            seen[next_candidate] = 0
+            continue
+        heapq.heappush(candidates, next_candidate)
+    return minimum
 
 
-def to_tuple(board):
-    return tuple(tuple(d) for d in board)
+def play(dataset: DataSet):
+    initial = dataset.initial_state()
+    candidates = [initial]
+    seen = {initial: 0}
+    minimum = None
+    while candidates:
+        minimum = evaluate_next(candidates, seen, minimum, dataset)
+    logging.info("Evaluated %d candidates.", dataset.count)
+    logging.info("The best path is:\n%s",
+                 '\n'.join(always_reversible(
+                     map(visualize, takewhile(bool, iterate(attrgetter('previous'), minimum))))))
+    return minimum
 
 
-def is_winning(board):
-    for key, value in home_columns.items():
-        if np.any(board[2:-1, value] != key):
-            return False
-    return True
+round_1 = dataset_parametrization(day="23", examples=[("", 12521)], result=12530, dataset_class=DataSet, depth=2)
+round_2 = dataset_parametrization(day="23", examples=[("", 44169)], result=50492, dataset_class=DataSet, depth=4)
+pytest_generate_tests = generate_rounds(round_1, round_2)
 
 
-def play(board: np.array):
-    min_energy = math.inf
-    candidate_states = [(board, 0)]
-    seen = {to_tuple(board): 0}
-    while candidate_states:
-        new_candidate_states = []
-        for c in candidate_states:
-            if is_winning(c[0]):
-                min_energy = c[1] if min_energy is None else min(min_energy, c[1])
-                continue
-            if c[1] > min_energy:
-                continue
-            to_move = free_amphipods(c[0])
-            for x0, x1 in zip(*to_move):
-                new_candidate_states.extend(find_next_moves(x0, x1, seen, *c))
-        candidate_states = new_candidate_states
-    return min_energy
-
-
-@pytest.mark.parametrize("input_file,get_data_fn,expected",
-                         (("input/day_23_example.txt", get_data_part_one, 12521),
-                          ("input/day_23.txt", get_data_part_one, 12530),
-                          ("input/day_23_example.txt", get_data_part_two, 44169),
-                          ("input/day_23.txt", get_data_part_two, 50492)))
-def test_day_23(input_file, get_data_fn, expected):
-    board = get_data_fn(input_file)
-    result = play(board)
-    assert result == expected
-
-
-debug_part_one = [to_tuple(board) for board in get_data_part_one("input/day_23_debug_01.txt")]
-debug_part_two = [to_tuple(board) for board in get_data_part_two("input/day_23_debug_02.txt")]
+def test_day_23(dataset: DataSet):
+    assert play(dataset).energy == dataset.result

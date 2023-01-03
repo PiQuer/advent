@@ -15,7 +15,6 @@ from utils import dataset_parametrization, DataSetBase
 
 
 ratelimit = RateLimitingFilter(rate=1, per=2, match=["Candidate"])
-logging.basicConfig(format="%(asctime)s %(lvlname)s %(message)s")
 logging.root.addFilter(ratelimit)
 
 

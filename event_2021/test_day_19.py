@@ -6,6 +6,12 @@ import itertools
 try:
     from scipy.spatial.transform import Rotation
     HAS_SCIPY = True
+    z_rotations = Rotation.from_euler('z', [0, 90, 180, 270], degrees=True)
+    y_rotations = [(Rotation.from_euler('y', d, degrees=True) * z_rotations).as_matrix().astype(int) for d in (90, -90)]
+    x_rotations = [(Rotation.from_euler('x', d, degrees=True) * z_rotations).as_matrix().astype(int) for d in
+                   (90, 180, -90)]
+    rotations = np.concatenate(
+        (z_rotations.as_matrix().astype(int), np.concatenate(y_rotations), np.concatenate(x_rotations)))
 except ImportError:
     from unittest.mock import Mock
     Rotation = Mock()
@@ -13,12 +19,6 @@ except ImportError:
 import math
 
 overlap_threshold = 12
-
-z_rotations = Rotation.from_euler('z', [0, 90, 180, 270], degrees=True)
-y_rotations = [(Rotation.from_euler('y', d, degrees=True)*z_rotations).as_matrix().astype(int) for d in (90, -90)]
-x_rotations = [(Rotation.from_euler('x', d, degrees=True)*z_rotations).as_matrix().astype(int) for d in (90, 180, -90)]
-rotations = np.concatenate(
-    (z_rotations.as_matrix().astype(int), np.concatenate(y_rotations), np.concatenate(x_rotations)))
 
 
 def get_scanner_reports(input_file: str):
