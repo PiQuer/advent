@@ -482,6 +482,17 @@ files = [
 ]
 
 [[package]]
+name = "sortedcontainers"
+version = "2.4.0"
+description = "Sorted Containers -- Sorted List, Sorted Dict, Sorted Set"
+optional = false
+python-versions = "*"
+files = [
+    {file = "sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0"},
+    {file = "sortedcontainers-2.4.0.tar.gz", hash = "sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88"},
+]
+
+[[package]]
 name = "tinyarray"
 version = "1.2.4"
 description = "Arrays of numbers for Python, optimized for small sizes"
@@ -516,4 +527,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9"
-content-hash = "4a7d44456b1bb2cd28be4c8a3175d611118044d1fb447da0feb4b1ffabda5609"
+content-hash = "154228b9110d85aee90f2705a314ce98ea8e08d87fa731729c035ef8b68ee74d"
