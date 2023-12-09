@@ -1,7 +1,8 @@
-from typing import Sequence, Any, Union, Optional, Iterator
-from pathlib import Path
 from dataclasses import dataclass, field
 from itertools import product
+from pathlib import Path
+from typing import Sequence, Any, Union, Optional, Iterator
+
 import numpy as np
 import tinyarray as ta
 
@@ -15,6 +16,7 @@ class DataSetBase:
 
     def lines(self) -> list[str]:
         return self.input_file.read_text().splitlines()
+
 
     def text(self) -> str:
         return self.input_file.read_text()

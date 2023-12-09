@@ -356,6 +356,17 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "primefac"
+version = "2.0.12"
+description = "Module and command-line utility for factoring integers into primes"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "primefac-2.0.12-py3-none-any.whl", hash = "sha256:d864ea1f538d0e948a9244401fe248ed7b22818c2cae51f5f3b4d31a4cb34d21"},
+    {file = "primefac-2.0.12.tar.gz", hash = "sha256:07616769a106a860bdff49d5d2d84a5267b26205a38529029f9f8bf916e5dc5f"},
+]
+
+[[package]]
 name = "py"
 version = "1.11.0"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
@@ -527,4 +538,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9"
-content-hash = "154228b9110d85aee90f2705a314ce98ea8e08d87fa731729c035ef8b68ee74d"
+content-hash = "ef35891f3856975dab3ef125f6f03cb6c67eaf4a5452f72f9e2b65241e1b0cf0"
