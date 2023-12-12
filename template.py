@@ -16,10 +16,10 @@ round_2 = dataset_parametrization(year=year, day=day, examples=[("", None)], res
 
 
 @pytest.mark.parametrize(**round_1)
-def test_round_1(dataset):
+def test_round_1(dataset: DataSet):
     pass
 
 
 @pytest.mark.parametrize(**round_2)
-def test_round_2(dataset):
+def test_round_2(dataset: DataSet):
     pass

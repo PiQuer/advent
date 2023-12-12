@@ -1,0 +1,89 @@
+import re
+from dataclasses import dataclass
+from typing import Iterator
+
+import pytest
+
+from utils import dataset_parametrization, DataSetBase
+
+# from utils import generate_rounds
+
+year="2023"
+day="12"
+
+
+@dataclass
+class State:
+    condition: str
+    contiguous: tuple[int, ...]
+
+
+def reduce(condition: str, contiguous: tuple[int, ...]) -> State|None:
+    if contiguous == ():
+        return None if '#' in condition else State("", ())
+    condition = condition.lstrip('.').rstrip('.')
+    if len(condition) < sum(contiguous) + len(contiguous) - 1:
+        return None
+    match = re.search(r'(.*?)(#*)$', condition)
+    left, right = match.group(1), match.group(2)
+    if (l:=len(right)) > contiguous[-1]:
+        return None
+    if l == contiguous[-1]:
+        return reduce(left[:-1], contiguous[:-1])
+    if l > 0:
+        if left.endswith('?'):
+            return reduce(f"{left[:-1]}#", contiguous[:-1] + (contiguous[-1] - l,))
+        return None
+    return State(left, contiguous)
+
+
+def configurations(state: State|None) -> int:
+    if state is None:
+        return 0
+    if state == State("", ()):
+        return 1
+    assert state.condition.endswith('?')
+    return configurations(reduce(state.condition[:-1], state.contiguous)) + \
+        configurations(reduce(f"{state.condition[:-1]}#", state.contiguous))
+
+
+class DataSet(DataSetBase):
+    def states(self) -> Iterator[State]:
+        yield from (reduce(con, tuple(map(int, cont.split(','))))
+                    for con, cont in map(lambda l: l.split(), self.lines()))
+
+round_1 = dataset_parametrization(year=year, day=day, examples=[("", 21)], result=7195, dataset_class=DataSet)
+round_2 = dataset_parametrization(year=year, day=day, examples=[("", None)], result=None, dataset_class=DataSet)
+# pytest_generate_tests = generate_rounds(round_1, round_2)
+
+
+@pytest.mark.parametrize(**round_1)
+def test_round_1(dataset: DataSet):
+    assert sum(map(configurations, dataset.states())) == dataset.result
+
+
+@pytest.mark.parametrize(**round_2)
+def test_round_2(dataset: DataSet):
+    pass
+
+
+@pytest.mark.parametrize("con,cont,answer",
+                         (("...#?###.", (1, 2), None),
+                          ("...?##", (2,), State("", ())),
+                          ("...?.##...", (1, 2), State("?", (1,))),
+                          ("###?###", (1, 4), None),
+                          ("..#.####", (1, 4), State("", ())),
+                          ("##.##", (4,), None)))
+def test_reduce(con, cont, answer):
+    assert reduce(con, cont) == answer
+
+
+@pytest.mark.parametrize("con,cont,answer",
+                         (("???.###", (1,1,3), 1),
+                          (".??..??...?##.", (1,1,3), 4),
+                          ("?#?#?#?#?#?#?#?", (1,3,1,6), 1),
+                          ("????.#...#...", (4,1,1), 1),
+                          ("????.######..#####.", (1,6,5), 4),
+                          ("?###????????", (3,2,1), 10)))
+def test_configurations(con, cont, answer):
+    assert configurations(reduce(con, cont)) == answer
