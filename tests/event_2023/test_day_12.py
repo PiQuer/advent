@@ -1,12 +1,12 @@
+import multiprocessing
 import re
 from dataclasses import dataclass
+from functools import cache
 from typing import Iterator
 
 import pytest
 
 from utils import dataset_parametrization, DataSetBase
-
-# from utils import generate_rounds
 
 year="2023"
 day="12"
@@ -16,6 +16,9 @@ day="12"
 class State:
     condition: str
     contiguous: tuple[int, ...]
+
+    def __hash__(self):
+        return hash((self.condition, self.contiguous))
 
 
 def reduce(condition: str, contiguous: tuple[int, ...]) -> State|None:
@@ -37,14 +40,16 @@ def reduce(condition: str, contiguous: tuple[int, ...]) -> State|None:
     return State(left, contiguous)
 
 
+@cache
 def configurations(state: State|None) -> int:
     if state is None:
         return 0
     if state == State("", ()):
         return 1
     assert state.condition.endswith('?')
-    return configurations(reduce(state.condition[:-1], state.contiguous)) + \
-        configurations(reduce(f"{state.condition[:-1]}#", state.contiguous))
+    a, b = reduce(state.condition[:-1], state.contiguous), \
+        reduce(f"{state.condition[:-1]}#", state.contiguous)
+    return configurations(a) + configurations(b)
 
 
 class DataSet(DataSetBase):
@@ -52,9 +57,13 @@ class DataSet(DataSetBase):
         yield from (reduce(con, tuple(map(int, cont.split(','))))
                     for con, cont in map(lambda l: l.split(), self.lines()))
 
+    def folded_states(self) -> Iterator[State]:
+        yield from (reduce('?'.join((con,)*5), tuple(map(int, cont.split(',')))*5)
+                    for con, cont in map(lambda l: l.split(), self.lines()))
+
 round_1 = dataset_parametrization(year=year, day=day, examples=[("", 21)], result=7195, dataset_class=DataSet)
-round_2 = dataset_parametrization(year=year, day=day, examples=[("", None)], result=None, dataset_class=DataSet)
-# pytest_generate_tests = generate_rounds(round_1, round_2)
+round_2 = dataset_parametrization(year=year, day=day, examples=[("", 525152)], result=33992866292225,
+                                  dataset_class=DataSet)
 
 
 @pytest.mark.parametrize(**round_1)
@@ -64,7 +73,8 @@ def test_round_1(dataset: DataSet):
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
-    pass
+    pool = multiprocessing.Pool()
+    assert sum(pool.map(configurations, dataset.folded_states())) == dataset.result
 
 
 @pytest.mark.parametrize("con,cont,answer",
