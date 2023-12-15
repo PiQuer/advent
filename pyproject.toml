@@ -23,7 +23,13 @@ primefac = "^2.0.12"
 pytest-pycharm = "^0.7.0"
 pytest-profiling = "^1.7.0"
 ratelimitingfilter = "^1.5"
+pylint = "^3.0.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pylint.'MESSAGES CONTROL']
+max-line-length = 120
+disable = ["C0115", "C0116"]
+extension-pkg-allow-list = ["tinyarray"]
