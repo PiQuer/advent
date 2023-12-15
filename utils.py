@@ -27,14 +27,14 @@ class DataSetBase:
     def np_array(self, dtype=np.int32) -> np.array:
         return np.loadtxt(self.input_file, dtype=dtype)
 
-    def np_array_digits(self) -> np.array:
+    def np_array_digits(self) -> np.ndarray:
         return np.genfromtxt(self.input_file, dtype=int, delimiter=1)
 
-    def np_array_bytes(self) -> np.array:
+    def np_array_bytes(self) -> np.ndarray:
         x = np.array(self.lines(), dtype=bytes)
         return x.view('S1').reshape((x.size, -1))
 
-    def np_array_str(self) -> np.array:
+    def np_array_str(self) -> np.ndarray:
         return np.array([list(line) for line in self.lines()])
 
 
