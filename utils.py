@@ -21,6 +21,9 @@ class DataSetBase:
     def text(self) -> str:
         return self.input_file.read_text()
 
+    def bytes(self) -> bytes:
+        return self.input_file.read_bytes()
+
     def separated_by_empty_line(self) -> list[str]:
         return self.input_file.read_text().split("\n\n")
 
