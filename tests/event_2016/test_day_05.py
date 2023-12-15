@@ -1,7 +1,13 @@
-import pytest
+"""
+--- Day 5: How About a Nice Game of Chess? ---
+https://adventofcode.com/2016/day/5
+"""
+import hashlib
 from itertools import islice
 from typing import Iterator
-import hashlib
+
+import pytest
+
 from utils import dataset_parametrization, DataSetBase
 
 

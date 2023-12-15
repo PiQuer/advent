@@ -1,3 +1,7 @@
+"""
+--- Day 15: Lens Library ---
+https://adventofcode.com/2023/day/15
+"""
 from dataclasses import dataclass, field
 from functools import reduce, cache
 

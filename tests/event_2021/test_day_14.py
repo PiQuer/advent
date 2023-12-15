@@ -1,3 +1,7 @@
+"""
+--- Day 14: Extended Polymerization ---
+https://adventofcode.com/2021/day/14
+"""
 from collections import defaultdict
 
 from utils import dataset_parametrization, DataSetBase, generate_rounds

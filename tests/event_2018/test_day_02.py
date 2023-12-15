@@ -1,8 +1,13 @@
-import pytest
+"""
+--- Day 2: Inventory Management System ---
+https://adventofcode.com/2018/day/2
+"""
 from itertools import combinations
-import numpy as np
-from utils import dataset_parametrization, DataSetBase
 
+import numpy as np
+import pytest
+
+from utils import dataset_parametrization, DataSetBase
 
 round_1 = dataset_parametrization("2018", "02", examples=[("1", 12)], result=5658)
 round_2 = dataset_parametrization("2018", "02", examples=[("2", "fgij")], result="nmgyjkpruszlbaqwficavxneo")

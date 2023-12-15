@@ -1,3 +1,7 @@
+"""
+--- Day 1: The Tyranny of the Rocket Equation ---
+https://adventofcode.com/2019/day/1
+"""
 from functools import partial
 
 from utils import dataset_parametrization, DataSetBase, generate_rounds

@@ -1,8 +1,11 @@
+"""
+--- Day 11: Dumbo Octopus ---
+https://adventofcode.com/2021/day/11
+"""
 import numpy as np
 import pytest
 
 from utils import dataset_parametrization, DataSetBase
-
 
 num_steps = 100
 window = (slice(1, -1), slice(1, -1))
@@ -48,6 +51,7 @@ def test_part_one(dataset: DataSet):
     result = 0
     for _ in range(num_steps):
         calculate_step(data)
+        # noinspection PyUnresolvedReferences
         result += (data[window] == 0).sum()
     assert result == dataset.result
 

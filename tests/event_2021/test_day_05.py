@@ -1,3 +1,7 @@
+"""
+--- Day 5: Hydrothermal Venture ---
+https://adventofcode.com/2021/day/5
+"""
 import numpy as np
 from numpy.lib import recfunctions as rfn
 

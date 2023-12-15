@@ -1,12 +1,16 @@
-import pytest
-from typing import Iterator
+"""
+--- Day 10: Cathode-Ray Tube ---
+https://adventofcode.com/2022/day/10
+"""
 from itertools import islice, count
 from operator import mul
+from typing import Iterator
+
 import numpy as np
+import pytest
 from more_itertools import chunked
 
 from utils import dataset_parametrization, DataSetBase
-
 
 example_output = """##..##..##..##..##..##..##..##..##..##..
 ###...###...###...###...###...###...###.

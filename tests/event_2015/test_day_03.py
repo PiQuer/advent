@@ -1,8 +1,13 @@
-import pytest
-import numpy as np
+"""
+--- Day 3: Perfectly Spherical Houses in a Vacuum ---
+https://adventofcode.com/2015/day/3
+"""
 from collections import defaultdict
-from utils import dataset_parametrization, DataSetBase
 
+import numpy as np
+import pytest
+
+from utils import dataset_parametrization, DataSetBase
 
 round_1 = dataset_parametrization("2015", "03", examples=[("1", 2), ("2", 4), ("3", 2)], result=2592)
 round_2 = dataset_parametrization("2015", "03", examples=[("4", 3), ("2", 3), ("3", 11)], result=2360)

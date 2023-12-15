@@ -1,3 +1,7 @@
+"""
+--- Day 4: Giant Squid ---
+https://adventofcode.com/2021/day/4
+"""
 from io import StringIO
 import numpy as np
 import pytest

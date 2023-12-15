@@ -1,6 +1,11 @@
-from typing import Iterator
-import pytest
+"""
+--- Day 2: Password Philosophy ---
+https://adventofcode.com/2020/day/2
+"""
 from dataclasses import dataclass
+from typing import Iterator
+
+import pytest
 
 from utils import dataset_parametrization, DataSetBase
 

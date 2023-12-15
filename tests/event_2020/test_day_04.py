@@ -1,8 +1,14 @@
-import pytest
-from dataclasses import dataclass
+"""
+--- Day 4: Passport Processing ---
+https://adventofcode.com/2020/day/4
+"""
 import re
-from utils import dataset_parametrization, DataSetBase
+from dataclasses import dataclass
+
+import pytest
 from more_itertools import peekable
+
+from utils import dataset_parametrization, DataSetBase
 
 
 @dataclass

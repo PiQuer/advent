@@ -1,3 +1,7 @@
+"""
+--- Day 8: Haunted Wasteland ---
+https://adventofcode.com/2023/day/8
+"""
 import re
 from functools import reduce
 from itertools import cycle, accumulate, takewhile, islice, chain

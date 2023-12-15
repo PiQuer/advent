@@ -1,9 +1,14 @@
-from typing import Optional, Iterator
-import pytest
+"""
+--- Day 4: Secure Container ---
+https://adventofcode.com/2019/day/4
+"""
 import re
-from more_itertools import difference, first_true
-from utils import dataset_parametrization, DataSetBase
+from typing import Optional, Iterator
 
+import pytest
+from more_itertools import difference, first_true
+
+from utils import dataset_parametrization, DataSetBase
 
 round_1 = dataset_parametrization(year="2019", day="04", examples=[], result=1099)
 round_2 = dataset_parametrization(year="2019", day="04", examples=[], result=710)

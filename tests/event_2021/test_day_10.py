@@ -1,3 +1,7 @@
+"""
+--- Day 10: Syntax Scoring ---
+https://adventofcode.com/2021/day/10
+"""
 import pytest
 from pathlib import Path
 

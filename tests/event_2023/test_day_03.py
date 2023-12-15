@@ -1,8 +1,13 @@
+"""
+--- Day 3: Gear Ratios ---
+https://adventofcode.com/2023/day/3
+"""
+from collections import defaultdict
+
 import numpy as np
 import pytest
-from more_itertools import peekable
 import tinyarray as ta
-from collections import defaultdict
+from more_itertools import peekable
 
 from utils import dataset_parametrization, DataSetBase, inbounds
 

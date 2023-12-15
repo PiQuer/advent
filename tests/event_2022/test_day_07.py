@@ -1,10 +1,13 @@
+"""
+--- Day 7: No Space Left On Device ---
+https://adventofcode.com/2022/day/7
+"""
+from collections import deque
 from itertools import accumulate
 
 import pytest
-from collections import deque
 
 from utils import dataset_parametrization, DataSetBase
-
 
 round_1 = dataset_parametrization(year="2022", day="07", examples=[("", 95437)], result=1350966)
 round_2 = dataset_parametrization(year="2022", day="07", examples=[("", 24933642)], result=6296435)

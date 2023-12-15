@@ -1,7 +1,12 @@
-import pytest
-import numpy as np
-from numpy.lib import recfunctions as rfn
+"""
+--- Day 17: Trick Shot ---
+https://adventofcode.com/2021/day/17
+"""
 import math
+
+import numpy as np
+import pytest
+from numpy.lib import recfunctions as rfn
 
 from utils import dataset_parametrization, DataSetBase
 

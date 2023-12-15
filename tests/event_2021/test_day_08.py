@@ -1,7 +1,10 @@
+"""
+--- Day 8: Seven Segment Search ---
+https://adventofcode.com/2021/day/8
+"""
 import pytest
 
 from utils import dataset_parametrization, DataSetBase
-
 
 number_of_segments = {0: 6, 1: 2, 2: 5, 3: 5, 4: 4, 5: 5, 6: 6, 7: 3, 8: 7, 9: 6}
 unique_segments = (2, 3, 4, 7)

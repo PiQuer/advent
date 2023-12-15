@@ -1,8 +1,11 @@
+"""
+--- Day 3: Squares With Three Sides ---
+https://adventofcode.com/2016/day/3
+"""
 import numpy as np
 import pytest
 
 from utils import dataset_parametrization, DataSetBase
-
 
 round_1 = dataset_parametrization("2016", "03", [], result=983)
 round_2 = dataset_parametrization("2016", "03", [], result=1836)

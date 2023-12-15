@@ -1,5 +1,11 @@
-import tinyarray as ta
+"""
+--- Day 9: Rope Bridge ---
+https://adventofcode.com/2022/day/9
+"""
 from itertools import repeat, accumulate
+
+import tinyarray as ta
+
 from utils import dataset_parametrization, DataSetBase, ta_directions, generate_rounds
 
 

@@ -1,10 +1,14 @@
-import pytest
-import numpy as np
-from collections import defaultdict, Counter
+"""
+--- Day 21: Dirac Dice ---
+https://adventofcode.com/2021/day/21
+"""
 import itertools
+from collections import defaultdict, Counter
+
+import numpy as np
+import pytest
 
 from utils import dataset_parametrization, DataSetBase
-
 
 deterministic_die = 100
 board = 10

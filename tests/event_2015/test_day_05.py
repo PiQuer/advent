@@ -1,4 +1,9 @@
+"""
+--- Day 5: Doesn't He Have Intern-Elves For This? ---
+https://adventofcode.com/2015/day/5
+"""
 import re
+
 from toolz import count
 
 from utils import dataset_parametrization, DataSetBase, generate_rounds

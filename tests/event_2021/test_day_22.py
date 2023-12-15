@@ -1,8 +1,12 @@
-import pytest
+"""
+--- Day 22: Reactor Reboot ---
+https://adventofcode.com/2021/day/22
+"""
 from typing import Optional
 
-from utils import dataset_parametrization, DataSetBase
+import pytest
 
+from utils import dataset_parametrization, DataSetBase
 
 Interval = tuple[int, int]
 

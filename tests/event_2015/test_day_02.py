@@ -1,8 +1,12 @@
-import pytest
+"""
+--- Day 2: I Was Told There Would Be No Math ---
+https://adventofcode.com/2015/day/2
+"""
 from itertools import combinations
 
-from utils import dataset_parametrization, DataSetBase
+import pytest
 
+from utils import dataset_parametrization, DataSetBase
 
 round_1 = dataset_parametrization("2015", "02", [("", 58 + 43)], result=1586300)
 round_2 = dataset_parametrization("2015", "02", [("", 34 + 14)], result=3737498)

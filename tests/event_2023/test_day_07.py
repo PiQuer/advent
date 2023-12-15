@@ -1,3 +1,7 @@
+"""
+--- Day 7: Camel Cards ---
+https://adventofcode.com/2023/day/7
+"""
 from collections import Counter
 from dataclasses import dataclass
 from functools import cached_property

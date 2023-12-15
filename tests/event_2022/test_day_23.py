@@ -1,17 +1,18 @@
 """
+--- Day 23: Unstable Diffusion ---
 https://adventofcode.com/2022/day/23
 """
+from collections import deque, defaultdict
 from itertools import islice, takewhile
 from operator import mul
-import pytest
-import numpy as np
-import tinyarray as ta
-from collections import deque, defaultdict
 from typing import Iterable, Optional
+
+import numpy as np
+import pytest
+import tinyarray as ta
 from more_itertools import first, lstrip, consume, quantify, iterate
 
 from utils import dataset_parametrization, DataSetBase
-
 
 neighbor_directions = {
     ta.array((-1, 0)): (ta.array((-1, -1)), ta.array((-1, 0)), ta.array((-1, 1))),

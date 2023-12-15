@@ -1,10 +1,14 @@
+"""
+--- Day 9: Smoke Basin ---
+https://adventofcode.com/2021/day/9
+"""
 import numpy as np
 import pytest
 
 from tests.event_2021.utils import shift
 from utils import dataset_parametrization, DataSetBase
 
-hightmap_max = 9
+height_map_max = 9
 
 
 def get_data(input_file: str) -> np.array:
@@ -18,7 +22,7 @@ def get_low_points(hightmap):
 
 def grow_basin(basin, hightmap):
     shifted = np.stack([shift(basin, amount=amount, axis=axis, fill=False) for amount in (1, -1) for axis in (0, 1)])
-    return np.logical_and(np.logical_or(basin, np.logical_or.reduce(shifted)), hightmap != hightmap_max)
+    return np.logical_and(np.logical_or(basin, np.logical_or.reduce(shifted)), hightmap != height_map_max)
 
 
 def max_basin(basin_start, hightmap):

@@ -1,8 +1,12 @@
-import pytest
+"""
+--- Day 1: Inverse Captcha ---
+https://adventofcode.com/2017/day/1
+"""
 import re
 
-from utils import dataset_parametrization, DataSetBase
+import pytest
 
+from utils import dataset_parametrization, DataSetBase
 
 round_1 = dataset_parametrization("2017", "01", [("_01", 3), ("_02", 4), ("_03", 0), ("_04", 9)], result=1182)
 round_2 = dataset_parametrization("2017", "01", [("_05", 6), ("_06", 0), ("_07", 4), ("_08", 12), ("_09", 4)],

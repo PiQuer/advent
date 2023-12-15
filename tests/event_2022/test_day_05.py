@@ -1,5 +1,10 @@
+"""
+--- Day 5: Supply Stacks ---
+https://adventofcode.com/2022/day/5
+"""
 from collections import defaultdict
 from itertools import takewhile, islice
+
 from utils import dataset_parametrization, DataSetBase, generate_rounds
 
 

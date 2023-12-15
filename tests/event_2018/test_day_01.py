@@ -1,8 +1,12 @@
+"""
+--- Day 1: Chronal Calibration ---
+https://adventofcode.com/2018/day/1
+"""
 from itertools import cycle
+
 import pytest
 
 from utils import dataset_parametrization, DataSetBase
-
 
 round_1 = dataset_parametrization("2018", "01", [], result=490)
 round_2 = dataset_parametrization("2018", "01", [], result=70357)

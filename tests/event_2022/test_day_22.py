@@ -1,17 +1,20 @@
 """
+--- Day 22: Monkey Map ---
 https://adventofcode.com/2022/day/22
 """
+import re
+from dataclasses import dataclass
 from functools import partial
 from itertools import takewhile, islice, cycle, product
 from operator import ne
-import pytest
-import numpy as np
-import re
-import tinyarray as ta
 from typing import Iterator, Optional
-from more_itertools import consume, last, lstrip, first
-from dataclasses import dataclass
+
 import networkx as nx
+import numpy as np
+import pytest
+import tinyarray as ta
+from more_itertools import consume, last, lstrip, first
+
 from utils import dataset_parametrization, DataSetBase, ta_directions_arrows
 
 

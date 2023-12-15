@@ -1,3 +1,7 @@
+"""
+--- Day 6: Lanternfish ---
+https://adventofcode.com/2021/day/6
+"""
 import numpy as np
 
 from utils import dataset_parametrization, DataSetBase, generate_rounds

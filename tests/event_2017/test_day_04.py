@@ -1,7 +1,12 @@
-import pytest
+"""
+--- Day 4: High-Entropy Passphrases ---
+https://adventofcode.com/2017/day/4
+"""
 from collections import Counter
-from utils import dataset_parametrization, DataSetBase
 
+import pytest
+
+from utils import dataset_parametrization, DataSetBase
 
 round_1 = dataset_parametrization(year="2017", day="04", examples=[("1", 2)], result=337)
 round_2 = dataset_parametrization(year="2017", day="04", examples=[("2", 3)], result=231)

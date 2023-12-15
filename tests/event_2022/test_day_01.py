@@ -1,4 +1,9 @@
+"""
+--- Day 1: Calorie Counting ---
+https://adventofcode.com/2022/day/1
+"""
 import heapq
+
 from utils import dataset_parametrization, DataSetBase, generate_rounds
 
 

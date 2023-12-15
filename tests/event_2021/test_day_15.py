@@ -1,5 +1,10 @@
-import numpy as np
+"""
+--- Day 15: Chiton ---
+https://adventofcode.com/2021/day/15
+"""
 import logging
+
+import numpy as np
 
 from utils import Waypoint, dataset_parametrization, DataSetBase, generate_rounds
 

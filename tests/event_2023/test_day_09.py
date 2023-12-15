@@ -1,3 +1,7 @@
+"""
+--- Day 9: Mirage Maintenance ---
+https://adventofcode.com/2023/day/9
+"""
 from functools import cached_property
 
 import numpy as np

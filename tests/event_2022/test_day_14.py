@@ -1,13 +1,16 @@
 """
+--- Day 14: Regolith Reservoir ---
 https://adventofcode.com/2022/day/14
 """
+from collections import defaultdict
 from itertools import product, repeat, takewhile
-from more_itertools import iterate, pairwise
+from operator import methodcaller, add
 from typing import Optional
+
 import pytest
 import tinyarray as ta
-from collections import defaultdict
-from operator import methodcaller, add
+from more_itertools import iterate, pairwise
+
 from utils import dataset_parametrization, DataSetBase
 
 

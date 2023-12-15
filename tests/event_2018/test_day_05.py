@@ -1,7 +1,12 @@
-import pytest
+"""
+--- Day 5: Alchemical Reduction ---
+https://adventofcode.com/2018/day/5
+"""
 import string
-from utils import dataset_parametrization, DataSetBase
 
+import pytest
+
+from utils import dataset_parametrization, DataSetBase
 
 round_1 = dataset_parametrization("2018", "05", examples=[("", 10)], result=10888)
 round_2 = dataset_parametrization("2018", "05", examples=[("", 4)], result=6952)

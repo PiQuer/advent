@@ -1,6 +1,10 @@
-from dataclasses import dataclass
+"""
+--- Day 5: If You Give A Seed A Fertilizer ---
+https://adventofcode.com/2023/day/5
+"""
 import functools
 import re
+from dataclasses import dataclass
 from itertools import chain
 from typing import Union, Iterator
 

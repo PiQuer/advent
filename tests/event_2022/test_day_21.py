@@ -1,12 +1,15 @@
 """
+--- Day 21: Monkey Math ---
 https://adventofcode.com/2022/day/21
 """
-from functools import partial
-import pytest
-import networkx as nx
 import re
+from functools import partial
 from operator import add, sub, mul, ifloordiv
 from typing import Callable
+
+import networkx as nx
+import pytest
+
 from utils import dataset_parametrization, DataSetBase
 
 

@@ -1,18 +1,20 @@
 """
+--- Day 12: Hill Climbing Algorithm ---
 https://adventofcode.com/2022/day/12
 """
-import pytest
-from typing import Iterable, Union
-import tinyarray as ta
 import math
-import numpy as np
-from operator import add
-from itertools import starmap, product, takewhile
-from more_itertools import one, peekable, iterate, chunked
 from collections import defaultdict
 from dataclasses import dataclass
-from utils import dataset_parametrization, DataSetBase, ta_adjacent, Waypoint
+from itertools import starmap, product, takewhile
+from operator import add
+from typing import Iterable, Union
 
+import numpy as np
+import pytest
+import tinyarray as ta
+from more_itertools import one, peekable, iterate, chunked
+
+from utils import dataset_parametrization, DataSetBase, ta_adjacent, Waypoint
 
 round_1 = dataset_parametrization(year="2022", day="12", examples=[("", 31)], result=380)
 round_2 = dataset_parametrization(year="2022", day="12", examples=[("", 29)], result=375)

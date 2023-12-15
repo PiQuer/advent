@@ -1,11 +1,15 @@
-import pytest
+"""
+--- Day 3: Crossed Wires ---
+https://adventofcode.com/2019/day/3
+"""
+from collections import defaultdict
 from itertools import repeat
+
+import pytest
 import tinyarray as ta
 from numpy import inf
-from collections import defaultdict
 
 from utils import dataset_parametrization, DataSetBase, ta_directions
-
 
 round_1 = dataset_parametrization(year="2019", day="03", examples=[("1", 6), ("2", 159), ("3", 135)], result=266)
 round_2 = dataset_parametrization(year="2019", day="03", examples=[("1", 30), ("2", 610), ("3", 410)], result=19242)

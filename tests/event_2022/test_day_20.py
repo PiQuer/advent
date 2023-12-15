@@ -1,17 +1,17 @@
 """
+--- Day 20: Grove Positioning System ---
 https://adventofcode.com/2022/day/20
 """
+from dataclasses import dataclass
 from functools import partial
 from itertools import islice
 from operator import attrgetter, mul
+from typing import Iterator, Optional
 
 import pytest
-from dataclasses import dataclass
-from typing import Iterator, Optional
 from more_itertools import iterate, nth_or_last, consume
 
 from utils import dataset_parametrization, DataSetBase
-
 
 round_1 = dataset_parametrization(year="2022", day="20", examples=[("", 3)], result=9945)
 round_2 = dataset_parametrization(year="2022", day="20", examples=[("", 1623178306)], result=3338877775442)

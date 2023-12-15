@@ -1,13 +1,16 @@
 """
+--- Day 17: Pyroclastic Flow ---
 https://adventofcode.com/2022/day/17
 """
-import tinyarray as ta
-import numpy as np
-from itertools import cycle, islice
-from dataclasses import dataclass
-from collections import deque
 import logging
+from collections import deque
+from dataclasses import dataclass
+from itertools import cycle, islice
+
+import numpy as np
+import tinyarray as ta
 from more_itertools import always_reversible
+
 from utils import dataset_parametrization, DataSetBase, generate_rounds
 
 

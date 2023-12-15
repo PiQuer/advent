@@ -1,8 +1,12 @@
+"""
+--- Day 2: Corruption Checksum ---
+https://adventofcode.com/2017/day/2
+"""
 from itertools import combinations
+
 import pytest
 
 from utils import dataset_parametrization, DataSetBase
-
 
 round_1 = dataset_parametrization("2017", "02", [("_01", 18)], result=36174)
 round_2 = dataset_parametrization("2017", "02", [("_02", 9)], result=244)

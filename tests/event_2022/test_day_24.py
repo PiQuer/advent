@@ -1,15 +1,17 @@
 """
+--- Day 24: Blizzard Basin ---
 https://adventofcode.com/2022/day/24
 """
+import heapq
+from dataclasses import dataclass
 from functools import cached_property, reduce, partial
 from itertools import chain, pairwise
-from typing import Optional, Iterator
-import pytest
-import numpy as np
-import tinyarray as ta
-from dataclasses import dataclass
-import heapq
 from operator import add, sub
+from typing import Optional, Iterator
+
+import numpy as np
+import pytest
+import tinyarray as ta
 
 from utils import dataset_parametrization, DataSetBase, ta_adjacent, inbounds
 

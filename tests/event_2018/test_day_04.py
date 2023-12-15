@@ -1,9 +1,14 @@
-import pytest
-from datetime import datetime
+"""
+--- Day 4: Repose Record ---
+https://adventofcode.com/2018/day/4
+"""
 import re
 from collections import Counter, defaultdict
+from datetime import datetime
 from itertools import chain, repeat
 from operator import mul
+
+import pytest
 
 from utils import dataset_parametrization, DataSetBase
 

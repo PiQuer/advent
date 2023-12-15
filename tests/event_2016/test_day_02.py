@@ -1,7 +1,11 @@
-import pytest
+"""
+--- Day 2: Bathroom Security ---
+https://adventofcode.com/2016/day/2
+"""
 import numpy as np
-from utils import dataset_parametrization, DataSetBase
+import pytest
 
+from utils import dataset_parametrization, DataSetBase
 
 keypad_1 = np.array(
     [[0, 0, 0, 0, 0],

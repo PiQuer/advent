@@ -1,3 +1,7 @@
+"""
+--- Day 11: Cosmic Expansion ---
+https://adventofcode.com/2023/day/11
+"""
 from itertools import combinations
 
 import numpy as np

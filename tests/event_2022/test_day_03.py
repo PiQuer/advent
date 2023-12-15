@@ -1,6 +1,10 @@
+"""
+--- Day 3: Rucksack Reorganization ---
+https://adventofcode.com/2022/day/3
+"""
 import pytest
-from utils import dataset_parametrization
 
+from utils import dataset_parametrization
 
 round_1 = dataset_parametrization(year="2022", day="03", examples=[("", 157)], result=7568)
 round_2 = dataset_parametrization(year="2022", day="03", examples=[("", 70)], result=2780)

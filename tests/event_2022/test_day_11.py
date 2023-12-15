@@ -1,11 +1,14 @@
 """
+--- Day 11: Monkey in the Middle ---
 https://adventofcode.com/2022/day/11
 """
-from typing import Iterable, Callable, Any
 import re
 from collections import deque
 from operator import pow, add, mul
+from typing import Iterable, Callable, Any
+
 from more_itertools import partition
+
 from utils import dataset_parametrization, DataSetBase, generate_rounds
 
 

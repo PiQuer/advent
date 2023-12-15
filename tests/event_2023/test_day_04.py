@@ -1,3 +1,7 @@
+"""
+--- Day 4: Scratchcards ---
+https://adventofcode.com/2023/day/4
+"""
 import re
 from collections import defaultdict
 from dataclasses import dataclass
@@ -6,6 +10,7 @@ from typing import Iterator
 import pytest
 
 from utils import dataset_parametrization, DataSetBase
+
 
 @dataclass
 class Card:

@@ -1,3 +1,7 @@
+"""
+--- Day 10: Pipe Maze ---
+https://adventofcode.com/2023/day/10
+"""
 import itertools
 from dataclasses import dataclass
 from functools import cached_property

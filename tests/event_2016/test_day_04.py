@@ -1,7 +1,12 @@
-import pytest
-from collections import Counter
+"""
+--- Day 4: Security Through Obscurity ---
+https://adventofcode.com/2016/day/4
+"""
 import re
+from collections import Counter
 from itertools import islice
+
+import pytest
 
 from utils import dataset_parametrization, DataSetBase
 

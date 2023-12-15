@@ -1,7 +1,11 @@
-import pytest
+"""
+--- Day 1: No Time for a Taxicab ---
+https://adventofcode.com/2016/day/1
+"""
 import numpy as np
-from utils import dataset_parametrization, DataSetBase
+import pytest
 
+from utils import dataset_parametrization, DataSetBase
 
 round_1 = dataset_parametrization(year="2016", day="01", examples=[("_01", 5), ("_02", 2), ("_03", 12)], result=300)
 round_2 = dataset_parametrization(year="2016", day="01", examples=[("_04", 4)], result=159)

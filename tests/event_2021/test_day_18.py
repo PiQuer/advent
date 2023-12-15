@@ -1,8 +1,13 @@
-import pytest
+"""
+--- Day 18: Snailfish ---
+https://adventofcode.com/2021/day/18
+"""
 import copy
 import itertools
-from typing import Union, Optional
 from dataclasses import dataclass
+from typing import Union, Optional
+
+import pytest
 
 from utils import dataset_parametrization, DataSetBase
 

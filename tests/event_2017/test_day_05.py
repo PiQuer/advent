@@ -1,7 +1,12 @@
+"""
+--- Day 5: A Maze of Twisty Trampolines, All Alike ---
+https://adventofcode.com/2017/day/5
+"""
 from itertools import count
-import pytest
-from utils import dataset_parametrization, DataSetBase
 
+import pytest
+
+from utils import dataset_parametrization, DataSetBase
 
 round_1 = dataset_parametrization(year="2017", day="05", examples=[("", 5)], result=372139)
 round_2 = dataset_parametrization(year="2017", day="05", examples=[("", 10)], result=29629538)

@@ -1,5 +1,10 @@
-import pytest
+"""
+--- Day 1: Report Repair ---
+https://adventofcode.com/2020/day/1
+"""
 from itertools import tee, filterfalse, product, combinations, chain
+
+import pytest
 
 from utils import dataset_parametrization, DataSetBase
 

@@ -1,18 +1,19 @@
 """
+--- Day 19: Not Enough Minerals ---
 https://adventofcode.com/2022/day/19
 """
-from itertools import islice
-from typing import Iterator, Optional
-import pytest
-import tinyarray as ta
-import re
-from dataclasses import dataclass
 import heapq
 import logging
+import re
+from dataclasses import dataclass
+from itertools import islice
+from typing import Iterator, Optional
+
+import pytest
+import tinyarray as ta
 from ratelimitingfilter import RateLimitingFilter
 
 from utils import dataset_parametrization, DataSetBase
-
 
 ratelimit = RateLimitingFilter(rate=1, per=2, match=["Candidate"])
 logging.root.addFilter(ratelimit)

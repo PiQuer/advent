@@ -1,22 +1,23 @@
 """
+--- Day 23: Amphipod ---
 https://adventofcode.com/2021/day/23
 """
-from pathlib import Path
-from typing import Optional, Iterator, Any
-import tinyarray as ta
-import numpy as np
-from itertools import chain, takewhile, islice
-from more_itertools import quantify, first, iterate, always_reversible, rstrip, lstrip
 import heapq
+import logging
+from collections import defaultdict
 from dataclasses import dataclass
 from functools import cached_property, cache, partial
-import logging
+from itertools import chain, takewhile, islice
 from operator import attrgetter, itemgetter, eq
-from collections import defaultdict
+from pathlib import Path
+from typing import Optional, Iterator, Any
+
+import numpy as np
+import tinyarray as ta
+from more_itertools import quantify, first, iterate, always_reversible, rstrip, lstrip
 from toolz import complement, count
 
 from utils import dataset_parametrization, DataSetBase, generate_rounds
-
 
 home_columns = {1: 3, 2: 5, 3: 7, 4: 9}
 hw_penalties = (1, 10, 100, 1000, 100, 10, 1)
@@ -24,7 +25,7 @@ hw_penalties = (1, 10, 100, 1000, 100, 10, 1)
 
 @dataclass(frozen=True)
 class State:
-    hallway: tuple[int]
+    hallway: tuple[int, ...]
     side_rooms: tuple[tuple[Any, ...]]
     depth: int
     energy: int

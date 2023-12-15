@@ -1,13 +1,16 @@
 """
+--- Day 15: Beacon Exclusion Zone ---
 https://adventofcode.com/2022/day/15
 """
-from functools import partial
-from typing import Optional
-import pytest
-from more_itertools import consume, pairwise
-import tinyarray as ta
 import re
+from functools import partial
 from itertools import starmap
+from typing import Optional
+
+import pytest
+import tinyarray as ta
+from more_itertools import consume, pairwise
+
 from utils import dataset_parametrization, DataSetBase
 
 

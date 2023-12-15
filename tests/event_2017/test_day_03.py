@@ -1,12 +1,16 @@
+"""
+--- Day 3: Spiral Memory ---
+https://adventofcode.com/2017/day/3
+"""
+import math
+from collections import defaultdict
 from itertools import islice, chain, repeat, count, cycle, dropwhile, accumulate
+
 import numpy as np
 import pytest
-import math
 from more_itertools import repeat_each
-from collections import defaultdict
 
 from utils import dataset_parametrization, DataSetBase, np_grid
-
 
 round_1 = dataset_parametrization("2017", "03",
                                   examples=[("1", 2), ("2", 3), ("3", 2), ("4", 31), ("5", 0)], result=371)

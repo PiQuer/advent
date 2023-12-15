@@ -1,15 +1,17 @@
 """
+--- Day 18: Boiling Boulders ---
 https://adventofcode.com/2022/day/18
 """
 from itertools import starmap, combinations
 from operator import mul, sub
-import pytest
-import numpy as np
-from more_itertools import circular_shifts
-import numpy_indexed as npi
-import tinyarray as ta
-from utils import dataset_parametrization, DataSetBase, ta_adjacent_3d
 
+import numpy as np
+import numpy_indexed as npi
+import pytest
+import tinyarray as ta
+from more_itertools import circular_shifts
+
+from utils import dataset_parametrization, DataSetBase, ta_adjacent_3d
 
 round_1 = dataset_parametrization(year="2022", day="18", examples=[("", 64)], result=3662)
 round_2 = dataset_parametrization(year="2022", day="18", examples=[("", 58)], result=2060)

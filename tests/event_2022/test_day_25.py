@@ -1,11 +1,13 @@
 """
+--- Day 25: Full of Hot Air ---
 https://adventofcode.com/2022/day/25
 """
-from itertools import zip_longest
 from functools import reduce
-import pytest
-from utils import dataset_parametrization, DataSetBase
+from itertools import zip_longest
 
+import pytest
+
+from utils import dataset_parametrization, DataSetBase
 
 round_1 = dataset_parametrization(year="2022", day="25", examples=[("", "2=-1=0")], result="20-1-11==0-=0112-222")
 

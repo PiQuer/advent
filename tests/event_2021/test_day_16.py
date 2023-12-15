@@ -1,10 +1,15 @@
-from pathlib import Path
+"""
+--- Day 16: Packet Decoder ---
+https://adventofcode.com/2021/day/16
+"""
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 from typing import List, Tuple, Union
-from bitarray import bitarray
+
 import bitarray.util as ba_util
 import numpy as np
+from bitarray import bitarray
 
 from utils import dataset_parametrization, DataSetBase, generate_rounds
 

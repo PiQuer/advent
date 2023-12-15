@@ -1,8 +1,13 @@
-import numpy as np
-import pytest
-import re
+"""
+--- Day 19: Beacon Scanner ---
+https://adventofcode.com/2021/day/19
+"""
 import itertools
 import math
+import re
+
+import numpy as np
+import pytest
 
 from utils import dataset_parametrization, DataSetBase
 

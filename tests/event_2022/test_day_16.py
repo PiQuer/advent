@@ -1,14 +1,16 @@
 """
+--- Day 16: Proboscidea Volcanium ---
 https://adventofcode.com/2022/day/16
 """
-from functools import cache
-import networkx as nx
-import re
-from typing import Optional
-from dataclasses import dataclass, field
-from itertools import product, combinations
-from more_itertools import padded, value_chain
 import heapq
+import re
+from dataclasses import dataclass, field
+from functools import cache
+from itertools import product, combinations
+from typing import Optional
+
+import networkx as nx
+from more_itertools import padded, value_chain
 
 from utils import dataset_parametrization, DataSetBase, generate_rounds
 

@@ -1,7 +1,12 @@
-import pytest
-import numpy as np
+"""
+--- Day 3: No Matter How You Slice It ---
+https://adventofcode.com/2018/day/3
+"""
 import re
 from typing import Iterator
+
+import numpy as np
+import pytest
 
 from utils import dataset_parametrization, DataSetBase
 

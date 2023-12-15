@@ -1,12 +1,16 @@
-import pytest
-import numpy as np
-from operator import mul
+"""
+--- Day 3: Toboggan Trajectory ---
+https://adventofcode.com/2020/day/3
+"""
 from functools import reduce
 from itertools import count
+from operator import mul
 from typing import Iterator
 
-from utils import dataset_parametrization, DataSetBase
+import numpy as np
+import pytest
 
+from utils import dataset_parametrization, DataSetBase
 
 round_1 = dataset_parametrization(year="2020", day="03", examples=[("", 7)], result=292)
 round_2 = dataset_parametrization(year="2020", day="03", examples=[("", 336)], result=9354744432)

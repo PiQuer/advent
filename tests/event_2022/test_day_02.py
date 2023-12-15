@@ -1,4 +1,9 @@
+"""
+--- Day 2: Rock Paper Scissors ---
+https://adventofcode.com/2022/day/2
+"""
 from pathlib import Path
+
 from utils import dataset_parametrization, DataSetBase, generate_rounds
 
 FILE_NAMES = {'example': Path("input/day_02_example.txt"), 'real': Path("input/day_02.txt")}
