@@ -4,18 +4,18 @@ https://adventofcode.com/2023/day/XX
 """
 import pytest
 
-from utils import dataset_parametrization, DataSetBase
+from adventofcode.utils import dataset_parametrization, DataSetBase
 
 # from utils import generate_rounds
 
-year="2023"
-day="00"
+YEAR= "2023"
+DAY= "00"
 
 class DataSet(DataSetBase):
     pass
 
-round_1 = dataset_parametrization(year=year, day=day, examples=[("", None)], result=None, dataset_class=DataSet)
-round_2 = dataset_parametrization(year=year, day=day, examples=[("", None)], result=None, dataset_class=DataSet)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", None)], result=None, dataset_class=DataSet)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", None)], result=None, dataset_class=DataSet)
 # pytest_generate_tests = generate_rounds(round_1, round_2)
 
 
