@@ -66,7 +66,7 @@ def linear_propagation(start: Beam) -> PropagationResult:
     current = start
     next_beams = set()
     while inbounds(CONTRAPTION.shape, current.coordinates) and current not in beams:
-        next_directions = DEFLECTIONS[CONTRAPTION[*current.coordinates]][current.direction]
+        next_directions = DEFLECTIONS[CONTRAPTION[tuple(current.coordinates)]][current.direction]
         if len(next_directions) == 2:
             next_beams.update(Beam(current.coordinates, d) for d in next_directions)
             break
