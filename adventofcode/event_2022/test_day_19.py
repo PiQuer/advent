@@ -54,7 +54,7 @@ def evaluate(buy: tuple[int, ...], blueprint: Blueprint, minutes, previous: Opti
     robots = ta.array((0, 0, 0, 1))
     idx_it = iter(buy)
     idx = next(idx_it, 3)
-    for minute in range(1, minutes + 1):
+    for _ in range(1, minutes + 1):
         inc = robots
         if min(resources - blueprint.costs[idx]) >= 0:
             resources -= blueprint.costs[idx]
@@ -125,7 +125,7 @@ def get_next_states(candidates: list[State], seen: dict[State, tuple[int, ...]],
         next_candidate = evaluate(t, blueprint, minutes, c)
         if next_candidate.total_decreased >= 2:
             continue
-        elif next_candidate.not_increased_since >= 3:
+        if next_candidate.not_increased_since >= 3:
             continue
         if next_candidate in seen and seen[next_candidate] >= next_candidate.resources:
             continue

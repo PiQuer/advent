@@ -12,13 +12,13 @@ from more_itertools import chunked
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
-example_output = """##..##..##..##..##..##..##..##..##..##..
+EXAMPLE_OUTPUT = """##..##..##..##..##..##..##..##..##..##..
 ###...###...###...###...###...###...###.
 ####....####....####....####....####....
 #####.....#####.....#####.....#####.....
 ######......######......######......####
 #######.......#######.......#######....."""
-result = """####...##.#..#.###..#..#.#....###..####.
+RESULT = """####...##.#..#.###..#..#.#....###..####.
 #.......#.#..#.#..#.#..#.#....#..#....#.
 ###.....#.#..#.###..#..#.#....#..#...#..
 #.......#.#..#.#..#.#..#.#....###...#...
@@ -39,7 +39,7 @@ class DataSet(DataSetBase):
 
 round_1 = dataset_parametrization(year="2022", day="10", examples=[("", 13140)], result=13060, dataset_class=DataSet)
 round_2 = dataset_parametrization(year="2022", day="10",
-                                  examples=[("", example_output)], result=result, dataset_class=DataSet)
+                                  examples=[("", EXAMPLE_OUTPUT)], result=RESULT, dataset_class=DataSet)
 
 
 @pytest.mark.parametrize(**round_1)

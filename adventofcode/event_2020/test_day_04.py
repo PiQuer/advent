@@ -11,6 +11,7 @@ from more_itertools import peekable
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass
 class Passport:
     byr: str
@@ -30,25 +31,26 @@ class Passport:
             return False
 
     def valid(self) -> bool:
+        result = True
         if not self.valid_year(self.byr, 1920, 2002):
-            return False
-        if not self.valid_year(self.iyr, 2010, 2020):
-            return False
-        if not self.valid_year(self.eyr, 2020, 2030):
-            return False
-        if (m := re.match(r"(\d+)(in|cm)$", self.hgt)) is None:
-            return False
-        if m.group(2) == "in" and not (59 <= int(m.group(1)) <= 76):
-            return False
-        if m.group(2) == "cm" and not (150 <= int(m.group(1)) <= 193):
-            return False
-        if re.match(r"#[\da-f]{6}$", self.hcl) is None:
-            return False
-        if self.ecl not in ("amb", "blu", "brn", "gry", "grn", "hzl", "oth"):
-            return False
-        if re.match(r"\d{9}$", self.pid) is None:
-            return False
-        return True
+            result = False
+        elif not self.valid_year(self.iyr, 2010, 2020):
+            result = False
+        elif not self.valid_year(self.eyr, 2020, 2030):
+            result = False
+        elif (m := re.match(r"(\d+)(in|cm)$", self.hgt)) is None:
+            result = False
+        elif m.group(2) == "in" and not 59 <= int(m.group(1)) <= 76:
+            result = False
+        elif m.group(2) == "cm" and not 150 <= int(m.group(1)) <= 193:
+            result = False
+        elif re.match(r"#[\da-f]{6}$", self.hcl) is None:
+            result = False
+        elif self.ecl not in ("amb", "blu", "brn", "gry", "grn", "hzl", "oth"):
+            result = False
+        elif re.match(r"\d{9}$", self.pid) is None:
+            result = False
+        return result
 
 
 class DataSet(DataSetBase):

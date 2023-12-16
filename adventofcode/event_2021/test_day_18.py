@@ -55,16 +55,16 @@ class SnailNumber:
 
     def _add_helper(self, n, which_part):
         other = "left" if which_part == "right" else "right"
-        element = self.__getattribute__(other)
+        element = getattr(self, other)
         if isinstance(element, int):
-            self.__setattr__(other, element + n)
+            setattr(self, other, element + n)
             return
-        sn = self.__getattribute__(other)
-        while isinstance(sn.__getattribute__(which_part), SnailNumber):
-            sn = sn.__getattribute__(which_part)
-        sn.__setattr__(which_part, sn.__getattribute__(which_part) + n)
+        sn = getattr(self, other)
+        while isinstance(getattr(sn, which_part), SnailNumber):
+            sn = getattr(sn, which_part)
+        setattr(sn, which_part, getattr(sn, which_part) + n)
 
-    def _explode(self, level=1) -> tuple[Optional[int], Optional[int], bool]:
+    def explode(self, level=1) -> tuple[Optional[int], Optional[int], bool]:
         if level > 4:
             return self.left, self.right, True
         result = self._explode_helper(level, which_part="left")
@@ -84,32 +84,32 @@ class SnailNumber:
         left = right = None
         explode_happened = False
         if isinstance(element, SnailNumber):
-            left, right, explode_happened = element._explode(level + 1)
+            left, right, explode_happened = element.explode(level + 1)
             if level == 4:
-                self.__setattr__(which_part, 0)
+                setattr(self, which_part, 0)
         add_fn((left, right)[select_other])
         return (left, None)[select], (right, None)[select_other], explode_happened
 
-    def _split(self) -> bool:
+    def split(self) -> bool:
         if isinstance(self.left, int):
             if self.left >= 10:
                 self.left = SnailNumber(left=self.left >> 1, right=(self.left >> 1) + (self.left & 1))
                 return True
         else:
-            if self.left._split():
+            if self.left.split():
                 return True
         if isinstance(self.right, int):
             if self.right >= 10:
                 self.right = SnailNumber(left=self.right >> 1, right=(self.right >> 1) + (self.right & 1))
                 return True
             return False
-        return self.right._split()
+        return self.right.split()
 
     def reduce(self) -> None:
         more = True
         while more:
-            _, _, exploded = self._explode()
-            more = exploded or self._split()
+            _, _, exploded = self.explode()
+            more = exploded or self.split()
 
     def __add__(self, other):
         result = SnailNumber(left=copy.deepcopy(self), right=copy.deepcopy(other))
@@ -134,7 +134,7 @@ class DataSet(DataSetBase):
 def test_explode(number, exploded):
     number = SnailNumber.from_str(number)
     exploded = SnailNumber.from_str(exploded)
-    _, _, explode_happened = number._explode()
+    _, _, explode_happened = number.explode()
     assert explode_happened
     assert number == exploded
 
@@ -148,7 +148,7 @@ def test_explode(number, exploded):
 def test_split(number, split):
     number = SnailNumber.from_str(number)
     split = SnailNumber.from_str(split)
-    split_happened = number._split()
+    split_happened = number.split()
     assert split_happened
     assert number == split
 

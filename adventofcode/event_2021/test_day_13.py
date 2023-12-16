@@ -8,7 +8,7 @@ from numpy.lib import recfunctions as rfn
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
-expected_code_example = """
+EXPECTED_CODE_EXAMPLE = """
 #####
 #   #
 #   #
@@ -18,7 +18,7 @@ expected_code_example = """
      
 """[1:-1]
 
-expected_code = """
+EXPECTED_CODE = """
 ###   ##  #  # ###  #  # #    #  # #    
 #  # #  # #  # #  # # #  #    # #  #    
 #  # #    #### #  # ##   #    ##   #    
@@ -48,7 +48,7 @@ def fold(data, axis, num):
 
 
 round_1 = dataset_parametrization("2021", "13", [("", 17)], result=751, dataset_class=DataSet)
-round_2 = dataset_parametrization("2021", "13", [("", expected_code_example)], result=expected_code,
+round_2 = dataset_parametrization("2021", "13", [("", EXPECTED_CODE_EXAMPLE)], result=EXPECTED_CODE,
                                   dataset_class=DataSet)
 
 

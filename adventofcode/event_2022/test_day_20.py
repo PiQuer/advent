@@ -30,7 +30,7 @@ class Node:
 
 class LinkedList:
     def __init__(self, node_it: Iterator[Node]):
-        self._nodes: dict[int, Node] = dict()
+        self._nodes: dict[int, Node] = {}
         self._id_zero = None
         n = None
         for node_id, n in enumerate(node_it):
@@ -56,7 +56,6 @@ class LinkedList:
         node.next = target_node.next
         node.previous = target_node
         target_node.next = node
-        pass
 
     def _target_node(self, node, value, index_mode=False):
         positions = value % (len(self._nodes) - 1 + int(index_mode))

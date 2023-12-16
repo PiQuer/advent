@@ -26,7 +26,7 @@ def build_tree(lines):
         elif line.startswith("dir "):
             sizes["".join(current) + f"{line[4:]}/"] = 0
         else:
-            size, name = line.split(' ')
+            size, _ = line.split(' ')
             size = int(size)
             for d in accumulate(current):
                 sizes[d] += size

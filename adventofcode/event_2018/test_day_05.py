@@ -16,7 +16,7 @@ def p_reduce(p: list[str], i: int) -> int:
     if i >= len(p) - 1:
         return i
     if p[i] != p[i+1] and p[i].lower() == p[i+1].lower():
-        del(p[i:i+2])
+        del p[i:i+2]
         return max(0, i-1)
     return i + 1
 

@@ -42,7 +42,7 @@ class LiteralPacket(Packet):
 
 
 def get_packet(input_file) -> Packet:
-    hex_string = Path(input_file).read_text()
+    hex_string = Path(input_file).read_text(encoding="ascii")
     bits = ba_util.int2ba(int(hex_string, 16), length=4*len(hex_string))
     packet, rest = parse_packet(bits)
     assert len(rest) == 0 or ba_util.ba2int(rest) == 0
@@ -78,6 +78,7 @@ def parse_operator(bits: bitarray) -> Tuple[List[Packet], bitarray]:
             packet, bits = parse_packet(bits)
             result.append(packet)
         return result, bits
+    assert False
 
 
 def parse_packet(bits: bitarray) -> Tuple[Packet, bitarray]:
@@ -94,29 +95,31 @@ def parse_packet(bits: bitarray) -> Tuple[Packet, bitarray]:
 def sum_version(packet: Union[Packet, LiteralPacket, OperatorPacket]):
     if packet.type_id == TypeID.LITERAL:
         return packet.version
-    else:
-        return packet.version + sum(sum_version(p) for p in packet.sub_packets)
+    return packet.version + sum(sum_version(p) for p in packet.sub_packets)
 
 
 def process(packet: Union[Packet, LiteralPacket, OperatorPacket]):
     if packet.type_id == TypeID.LITERAL:
         return packet.content
     sub = list(process(p) for p in packet.sub_packets)
-    if packet.type_id == TypeID.OPERATOR_SUM:
-        return np.sum(sub)
-    if packet.type_id == TypeID.OPERATOR_PROD:
-        return np.prod(sub)
-    if packet.type_id == TypeID.OPERATOR_MIN:
-        return np.min(sub)
-    if packet.type_id == TypeID.OPERATOR_MAX:
-        return np.max(sub)
-    if packet.type_id == TypeID.OPERATOR_GT:
-        return int(sub[0] > sub[1])
-    if packet.type_id == TypeID.OPERATOR_LT:
-        return int(sub[0] < sub[1])
-    if packet.type_id == TypeID.OPERATOR_EQ:
-        return int(sub[0] == sub[1])
-
+    match packet.type_id:
+        case TypeID.OPERATOR_SUM:
+            result = np.sum(sub)
+        case TypeID.OPERATOR_PROD:
+            result = np.prod(sub)
+        case TypeID.OPERATOR_MIN:
+            result = np.min(sub)
+        case TypeID.OPERATOR_MAX:
+            result = np.max(sub)
+        case TypeID.OPERATOR_GT:
+            result = int(sub[0] > sub[1])
+        case TypeID.OPERATOR_LT:
+            result = int(sub[0] < sub[1])
+        case TypeID.OPERATOR_EQ:
+            result = int(sub[0] == sub[1])
+        case _:
+            assert False
+    return result
 
 round_1 = dataset_parametrization(
     "2021", "16", [("_01", 6), ("_02", 9), ("_03", 14), ("_04", 16), ("_05", 12), ("_06", 23), ("_07", 31)],

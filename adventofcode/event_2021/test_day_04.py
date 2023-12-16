@@ -9,7 +9,7 @@ import pytest
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
 
-board_size = 5
+BOARD_SIZE = 5
 
 
 class DataSet(DataSetBase):
@@ -17,7 +17,7 @@ class DataSet(DataSetBase):
         data = self.text()
         numbers_str, _, boards_str = data.split("\n", 2)
         numbers = np.fromstring(numbers_str, sep=',', dtype=int)
-        boards = np.reshape(np.genfromtxt(StringIO(boards_str), dtype=int), (-1, board_size, board_size))
+        boards = np.reshape(np.genfromtxt(StringIO(boards_str), dtype=int), (-1, BOARD_SIZE, BOARD_SIZE))
         return numbers, boards
 
 
@@ -38,7 +38,7 @@ def test_bingo(dataset: DataSet):
     result_part_one, result_part_two = None, None
     for n in numbers:
         marked |= boards == n
-        now_winning = np.any((marked.sum(axis=2) == board_size) | (marked.sum(axis=1) == board_size), axis=1)
+        now_winning = np.any((marked.sum(axis=2) == BOARD_SIZE) | (marked.sum(axis=1) == BOARD_SIZE), axis=1)
         winning_in_this_round = np.logical_xor(winning, now_winning)
         if np.any(winning_in_this_round) and np.all(~winning):
             result_part_one = get_score(winning_in_this_round, boards, marked, n)

@@ -28,19 +28,20 @@ class Hand:
         jokers = counts["1"]
         del counts["1"]
         c = sorted(list(counts.values()))
+        result = 0
         if jokers == 5 or c[-1] + jokers == 5:
-            return 6
-        if c[-1] + jokers == 4:
-            return 5
-        if c[-1] + c[-2] + jokers == 5:
-            return 4
-        if c[-1] + jokers == 3:
-            return 3
-        if c[-1] + c[-2] + jokers == 4:
-            return 2
-        if c[-1] + jokers == 2:
-            return 1
-        return 0
+            result = 6
+        elif c[-1] + jokers == 4:
+            result = 5
+        elif c[-1] + c[-2] + jokers == 5:
+            result = 4
+        elif c[-1] + jokers == 3:
+            result = 3
+        elif c[-1] + c[-2] + jokers == 4:
+            result = 2
+        elif c[-1] + jokers == 2:
+            result = 1
+        return result
 
 
 class Hand1(Hand):

@@ -9,11 +9,11 @@ import pytest
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
-year="2023"
-day="15"
+YEAR= "2023"
+DAY= "15"
 
-round_1 = dataset_parametrization(year=year, day=day, examples=[("", 1320)], result=507291, dataset_class=DataSetBase)
-round_2 = dataset_parametrization(year=year, day=day, examples=[("", 145)], result=296921, dataset_class=DataSetBase)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 1320)], result=507291, dataset_class=DataSetBase)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 145)], result=296921, dataset_class=DataSetBase)
 
 
 def update(current: int, char: int) -> int:

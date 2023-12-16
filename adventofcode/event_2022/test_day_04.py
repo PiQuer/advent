@@ -23,7 +23,7 @@ def contained(pair1: tuple, pair2: tuple):
 
 
 def contained_both_ways(pair1: tuple, pair2: tuple):
-    return contained(pair1, pair2) or contained(pair2, pair1)
+    return contained(pair1=pair1, pair2=pair2) or contained(pair1=pair2, pair2=pair1)
 
 
 def overlap(pair1: tuple, pair2: tuple):

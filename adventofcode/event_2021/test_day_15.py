@@ -42,7 +42,7 @@ def visualize_path(data, best_path):
     visualize = data.copy()
     next_point = (data.shape[0]-1, data.shape[1]-1)
     visualize[next_point] = 100 + data[next_point]
-    while not next_point == (0, 0):
+    while next_point != (0, 0):
         next_point = best_path[next_point].previous
         visualize[next_point] = 100 + data[next_point]
     return visualize

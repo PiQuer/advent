@@ -4,7 +4,8 @@ https://adventofcode.com/2022/day/11
 """
 import re
 from collections import deque
-from operator import pow, add, mul
+from operator import pow as op_pow
+from operator import add, mul
 from typing import Iterable, Callable, Any
 
 from more_itertools import partition
@@ -13,6 +14,7 @@ from adventofcode.utils import dataset_parametrization, DataSetBase, generate_ro
 
 
 class Monkey:
+    #pylint: disable=too-many-arguments
     def __init__(self, worry_levels: Iterable[Any], op: Callable[[int, int], int], const: int, divider: int,
                  target_true: int, target_false: int):
         self._op = op
@@ -71,13 +73,13 @@ class DataSet(DataSetBase):
                               re.MULTILINE | re.DOTALL)
             op_match = match.group(3)[4:]
             if op_match == "* old":
-                op, const = pow, 2
+                op, const = op_pow, 2
             elif "+" in op_match:
                 op, const = add, int(op_match[2:])
             elif "*" in op_match:
                 op, const = mul, int(op_match[2:])
             else:
-                raise NotImplemented
+                raise NotImplementedError
             result[int(match.group(1))] = \
                 self._monkey_factory(worry_levels=self._wl(match.group(2)), op=op, const=const,
                                      divider=int(match.group(4)), target_true=int(match.group(5)),

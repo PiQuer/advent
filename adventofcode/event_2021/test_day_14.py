@@ -10,7 +10,7 @@ from adventofcode.utils import dataset_parametrization, DataSetBase, generate_ro
 class DataSet(DataSetBase):
     def get_data(self):
         mapping = {}
-        with self.input_file.open('r') as f:
+        with self.input_file.open('r', encoding="ascii") as f:
             template_str = f.readline().strip() + " "
             f.readline()
             for line in f.readlines():

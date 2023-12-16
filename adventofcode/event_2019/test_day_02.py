@@ -66,7 +66,7 @@ def test_round_2(dataset: DataSetBase):
         i.reg[1], i.reg[2] = noun, verb
         i.compute()
         if i.reg[0] == 19690720:
+            assert 100 * noun + verb == 6421
             break
     else:
         assert False
-    assert 100*noun + verb == 6421

@@ -40,7 +40,7 @@ def test_round_2(dataset: DataSetBase):
             product(lower, middle, upper)
     ):
         if n1 + n2 + n3 == 2020:
+            assert n1 * n2 * n3 == dataset.result
             break
     else:
         assert False
-    assert n1 * n2 * n3 == dataset.result

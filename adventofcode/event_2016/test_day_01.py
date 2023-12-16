@@ -34,7 +34,7 @@ def test_round_2(dataset: DataSetBase):
     done = False
     for direction in data:
         heading = np.matmul(rotation[direction[0]], heading)
-        for v in range(1, int(direction[1:]) + 1):
+        for _ in range(1, int(direction[1:]) + 1):
             pos += heading
             if tuple(pos) in seen:
                 done = True

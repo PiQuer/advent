@@ -75,10 +75,10 @@ def test_round_1(dataset: DataSet):
     for c in itertools.count(1):
         cursor1, cursor2 = advance(cursor1, dataset.field), advance(cursor2, dataset.field)
         if cursor1.pos == cursor2.pos:
+            assert c == dataset.result
             break
     else:
         assert False
-    assert c == dataset.result
 
 
 def cross_product(v1: ta.ndarray_int, v2: ta.ndarray_int):

@@ -117,12 +117,13 @@ class PolyCuboid:
 
 class DataSet(DataSetBase):
     def get_data(self):
-        for line in self.input_file.open("r"):
+        for line in self.lines():
             on_off, coords_str = line.split()
             coords = []
             for c in coords_str.split(','):
                 i, j = map(int, c[2:].split('..'))
                 coords.extend((i, j+1))
+            #pylint: disable=no-value-for-parameter
             yield on_off, Cuboid(*coords)
 
 

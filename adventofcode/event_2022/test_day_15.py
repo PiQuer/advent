@@ -44,6 +44,7 @@ class DataSet(DataSetBase):
     def get_interval(sensor: ta.array, beacon: ta.array, y: int) -> Optional[list[int]]:
         if (dx := sum(ta.abs(beacon - sensor)) - abs(sensor[1] - y)) >= 0:
             return [sensor[0] - dx, sensor[0] + dx + 1, y]
+        return None
 
     def intervals(self, y: int):
         return filter(bool, starmap(partial(self.get_interval, y=y), zip(self.sensors, self.beacons)))

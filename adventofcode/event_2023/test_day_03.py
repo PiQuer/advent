@@ -75,7 +75,7 @@ def test_round_1(dataset: DataSetBase):
 def test_round_2(dataset: DataSetBase):
     a = dataset.np_array_bytes()
     index_iter = peekable(np.ndindex(a.shape))
-    gears = defaultdict(lambda: set())
+    gears = defaultdict(set)
     while index_iter:
         update_gear(a, index_iter, gears)
-    assert sum(np.prod(list(gears[k])) for k in gears.keys() if len(gears[k]) == 2) == dataset.result
+    assert sum(np.prod(list(v)) for k, v in gears.items() if len(v) == 2) == dataset.result

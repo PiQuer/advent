@@ -96,6 +96,7 @@ def test_day_17(dataset: DataSetBase):
                         cycle_detector.check(dh, idx, height)
                     break
     except EndOfProblem as e:
+        #pylint: disable=unbalanced-tuple-unpacking
         h_cycle, idx, current_height = e.args
         cycles, rest = divmod(dataset.params["rounds"] - idx - 1, len(h_cycle))
         height = current_height + sum(h_cycle) * cycles + sum(islice(h_cycle, rest))

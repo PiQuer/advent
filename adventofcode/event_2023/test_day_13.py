@@ -7,8 +7,8 @@ import pytest
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
-year="2023"
-day="13"
+YEAR= "2023"
+DAY= "13"
 
 class DataSet(DataSetBase):
     def preprocess(self):
@@ -17,8 +17,8 @@ class DataSet(DataSetBase):
             yield x.view('S1').reshape((x.size, -1))
 
 
-round_1 = dataset_parametrization(year=year, day=day, examples=[("", 405)], result=33780, dataset_class=DataSet)
-round_2 = dataset_parametrization(year=year, day=day, examples=[("", 400)], result=23479, dataset_class=DataSet)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 405)], result=33780, dataset_class=DataSet)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 400)], result=23479, dataset_class=DataSet)
 
 
 def get_mirror_axis_horizontal(a: np.ndarray, smudge: bool = False) -> int | None:

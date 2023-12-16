@@ -5,6 +5,8 @@ https://adventofcode.com/2022/day/5
 from collections import defaultdict
 from itertools import takewhile, islice
 
+from more_itertools import consume
+
 from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
 
 
@@ -17,7 +19,7 @@ class DataSet(DataSetBase):
                 if char != ' ':
                     stack_dict[num+1].append(char)
         yield stack_dict
-        next(i)  # consume empty line
+        consume(i, n=1)  # consume empty line
         for line in i:
             yield tuple(int(c) for c in line.split(' ') if c.isdigit())
 
@@ -34,5 +36,5 @@ def test_day_5(dataset: DataSet):
     stack = next(it)
     for num, f, t in it:
         stack[t].extend(stack[f][dataset.params['slice'](num)])
-        del(stack[f][-num:])
+        del stack[f][-num:]
     assert ''.join(stack[k][-1] for k in stack.keys()) == dataset.result

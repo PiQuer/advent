@@ -43,7 +43,7 @@ def test_round_1(dataset: DataSet):
     network = dataset.network()
     cursor = 'AAA'
     step = 0
-    while not cursor == 'ZZZ':
+    while cursor != 'ZZZ':
         step, direction = next(directions)
         cursor = network[cursor][0] if direction == "L" else network[cursor][1]
     assert step + 1 == dataset.result

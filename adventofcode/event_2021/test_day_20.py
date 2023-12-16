@@ -19,7 +19,7 @@ class DataSet(DataSetBase):
 
 def shift(array: np.array, axes):
     slices = {-1: (2, None), 0: (1, -1), 1: (None, -2)}
-    return array[tuple([slice(*slices[a]) for a in axes])]
+    return array[*(slice(*slices[a]) for a in axes)]
 
 
 def enhance(enhancement_algorithm: np.ndarray, image: np.ndarray, step):

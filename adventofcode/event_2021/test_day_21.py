@@ -10,10 +10,10 @@ import pytest
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
-deterministic_die = 100
-board = 10
-points_to_win_det = 1000
-points_to_win_dirac = 21
+DETERMINISTIC_DIE = 100
+BOARD = 10
+POINTS_TO_WIN = 1000
+POINTS_TO_WIN_DIRAC = 21
 
 
 class DataSet(DataSetBase):
@@ -28,10 +28,10 @@ def play_deterministic(pos_1, pos_2):
     winner_found = False
     while not winner_found:
         for p in (0, 1):
-            pos[p] = (pos[p] + (np.arange(d, d+3) % deterministic_die + 1).sum()) % board
+            pos[p] = (pos[p] + (np.arange(d, d+3) % DETERMINISTIC_DIE + 1).sum()) % BOARD
             points[p] += pos[p] + 1
             d += 3
-            if points[p] >= points_to_win_det:
+            if points[p] >= POINTS_TO_WIN:
                 winner_found = True
                 break
     return d * min(points)
@@ -49,9 +49,9 @@ def play_dirac(pos_1, pos_2):
             for outcome, new_universes in outcomes.items():
                 pos, points = np.array(state[0:2]), np.array(state[2:4])
                 pos[active] += outcome
-                pos[active] %= board
+                pos[active] %= BOARD
                 points[active] += pos[active] + 1
-                if points[active] >= points_to_win_dirac:
+                if points[active] >= POINTS_TO_WIN_DIRAC:
                     winning[active] += universes * new_universes
                 else:
                     states_next[tuple(pos) + tuple(points)] += universes * new_universes

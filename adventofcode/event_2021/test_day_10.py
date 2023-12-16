@@ -2,17 +2,17 @@
 --- Day 10: Syntax Scoring ---
 https://adventofcode.com/2021/day/10
 """
-import pytest
 from pathlib import Path
 
-from adventofcode.utils import dataset_parametrization, DataSetBase
+import pytest
 
+from adventofcode.utils import dataset_parametrization, DataSetBase
 
 delimiters = {'(': ')', '[': ']', '{': '}', '<': '>'}
 
 
 def get_data(input_file: str):
-    return Path(input_file).read_text().splitlines()
+    return Path(input_file).read_text(encoding='ascii').splitlines()
 
 
 class IllegalCharacter(Exception):
@@ -36,7 +36,7 @@ class IncompleteLineException(Exception):
 def parse_chunk(line):
     stack = ''
     for char in line:
-        if char in delimiters.keys():
+        if char in delimiters:
             stack += delimiters[char]
         elif char in delimiters.values():
             if char == stack[-1]:

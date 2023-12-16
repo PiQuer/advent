@@ -77,8 +77,8 @@ def line_to_mapping(line: str) -> Mapping:
 
 
 class DataSet(DataSetBase):
-    @functools.cache
-    def get_mappings(self) -> tuple[list[int], dict[str, Map]]:
+    @functools.cached_property
+    def mappings(self) -> tuple[list[int], dict[str, Map]]:
         blocks = self.separated_by_empty_line()
         seeds = list(map(lambda x: int(x[0]), re.finditer(r'\d+', blocks[0])))
         maps = {}
@@ -100,7 +100,7 @@ round_2 = dataset_parametrization(year="2023", day="05", examples=[("", 46)], re
 pytest_generate_tests = generate_rounds(round_1, round_2)
 
 def test_day_5(dataset: DataSet):
-    seeds, mappings = dataset.get_mappings()
+    seeds, mappings = dataset.mappings
     if dataset.params['ranges']:
         seeds_ranges = list(Range(*t) for t in chunked(seeds, 2))
     else:

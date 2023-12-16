@@ -12,8 +12,8 @@ import pytest
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
-year="2023"
-day="12"
+YEAR= "2023"
+DAY= "12"
 
 
 @dataclass
@@ -25,6 +25,7 @@ class State:
         return hash((self.condition, self.contiguous))
 
 
+#pylint: disable=too-many-return-statements
 def reduce(condition: str, contiguous: tuple[int, ...]) -> State|None:
     if contiguous == ():
         return None if '#' in condition else State("", ())
@@ -65,8 +66,8 @@ class DataSet(DataSetBase):
         yield from (reduce('?'.join((con,)*5), tuple(map(int, cont.split(',')))*5)
                     for con, cont in map(lambda l: l.split(), self.lines()))
 
-round_1 = dataset_parametrization(year=year, day=day, examples=[("", 21)], result=7195, dataset_class=DataSet)
-round_2 = dataset_parametrization(year=year, day=day, examples=[("", 525152)], result=33992866292225,
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 21)], result=7195, dataset_class=DataSet)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 525152)], result=33992866292225,
                                   dataset_class=DataSet)
 
 
@@ -77,8 +78,8 @@ def test_round_1(dataset: DataSet):
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
-    pool = multiprocessing.Pool()
-    assert sum(pool.map(configurations, dataset.folded_states())) == dataset.result
+    with multiprocessing.Pool() as pool:
+        assert sum(pool.map(configurations, dataset.folded_states())) == dataset.result
 
 
 @pytest.mark.parametrize("con,cont,answer",

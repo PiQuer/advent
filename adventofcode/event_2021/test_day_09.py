@@ -5,10 +5,9 @@ https://adventofcode.com/2021/day/9
 import numpy as np
 import pytest
 
-from adventofcode.event_2021.utils import shift
-from adventofcode.utils import dataset_parametrization, DataSetBase
+from adventofcode.utils import dataset_parametrization, DataSetBase, shift
 
-height_map_max = 9
+HEIGHT_MAP_MAX = 9
 
 
 def get_data(input_file: str) -> np.array:
@@ -22,7 +21,7 @@ def get_low_points(hightmap):
 
 def grow_basin(basin, hightmap):
     shifted = np.stack([shift(basin, amount=amount, axis=axis, fill=False) for amount in (1, -1) for axis in (0, 1)])
-    return np.logical_and(np.logical_or(basin, np.logical_or.reduce(shifted)), hightmap != height_map_max)
+    return np.logical_and(np.logical_or(basin, np.logical_or.reduce(shifted)), hightmap != HEIGHT_MAP_MAX)
 
 
 def max_basin(basin_start, hightmap):

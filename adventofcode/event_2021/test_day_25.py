@@ -4,12 +4,13 @@ https://adventofcode.com/2021/day/25
 """
 import numpy as np
 import pytest
+from more_itertools import consume
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
 
 def visualize(board):
-    [print(''.join(line)) for line in board]
+    consume(print(''.join(line)) for line in board)
 
 
 def move(board):

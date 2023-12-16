@@ -57,7 +57,7 @@ class DataSet(DataSetBase):
 @dataclass
 class Seen:
     glob: dict[tuple, tuple[int, int]] = field(default_factory=dict)
-    ind: dict[int, dict[tuple[str, frozenset[str]], int]] = field(default_factory=lambda: {0: dict(), 1: dict()})
+    ind: dict[int, dict[tuple[str, frozenset[str]], int]] = field(default_factory=lambda: {0: {}, 1: {}})
 
 
 class DeadEnd(Exception):
@@ -91,6 +91,7 @@ def get_next_candidates(candidates: list[State], graph: nx.Graph, seen: Seen, da
                                          all_opened=all_opened, previous=c))
 
 
+#pylint: disable=too-many-arguments
 def open_valve(all_opened, c, graph, next_minute, opened, p, pressure, seen):
     for idx, n in enumerate(p):
         if n == c.pos[idx]:

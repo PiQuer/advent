@@ -87,7 +87,7 @@ class DataSet(DataSetBase):
                     if board[0][tuple(new_node)] == 1:
                         result.add_edge(node, new_node, **{ew.from_facing: ew.to_facing})
                     break
-                elif node in ew.to_c:
+                if node in ew.to_c:
                     new_node = ew.from_c[ew.to_c.index(node)]
                     if board[0][tuple(new_node)] == 1:
                         result.add_edge(node, ew.from_c[ew.to_c.index(node)],
@@ -177,7 +177,6 @@ def walk_round_2(pos: ta.array, graph: nx.MultiDiGraph, instr: tuple[str, int], 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
-    board, _ = dataset.board()
     graph, pos = dataset.graph(dataset.params["edge_wrap"])
     facing = ">"
     for instr in dataset.instructions():

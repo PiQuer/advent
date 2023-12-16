@@ -13,8 +13,8 @@ unique_segments = (2, 3, 4, 7)
 class DataSet(DataSetBase):
     def get_data(self):
         return [[list(map(set, x.split())) for x in line.split('|')] for line in self.lines()]
-    
-    
+
+
 round_1 = dataset_parametrization("2021", "08", [("", 26)], result=445, dataset_class=DataSet)
 round_2 = dataset_parametrization("2021", "08", [("", 61229)], result=1043101, dataset_class=DataSet)
 
@@ -43,5 +43,5 @@ def test_part_two(dataset: DataSet):
         p[6] = [s for s in p[6] if not p[1] < s][0]
         p[9] = [s for s in p[9] if p[3] < s][0]
         inv_p = {tuple(sorted(v)): k for k, v in p.items()}
-        result += int("{}{}{}{}".format(*[inv_p[tuple(sorted(d))] for d in display]))
+        result += int(''.join(map(str, (inv_p[tuple(sorted(d))] for d in display))))
     assert result == dataset.result

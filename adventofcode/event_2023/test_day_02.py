@@ -29,7 +29,7 @@ class Game:
     subsets: tuple[Subset]
 
     def min_subset(self) -> Subset:
-        return Subset(**{color: max(s.__getattribute__(color) for s in self.subsets)
+        return Subset(**{color: max(getattr(s, color) for s in self.subsets)
                          for color in ("red", "green", "blue")})
 
 

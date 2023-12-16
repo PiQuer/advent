@@ -7,8 +7,8 @@ import pytest
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
-num_steps = 100
-window = (slice(1, -1), slice(1, -1))
+NUM_STEPS = 100
+WINDOW = (slice(1, -1), slice(1, -1))
 
 
 class DataSet(DataSetBase):
@@ -21,19 +21,19 @@ class DataSet(DataSetBase):
 
 def shift(array: np.array, axes):
     slices = {-1: (2, None), 0: (1, -1), 1: (None, -2)}
-    return array[tuple([slice(*slices[a]) for a in axes])]
+    return array[*(slice(*slices[a]) for a in axes)]
 
 
 def flash(data):
     adjacents = np.stack([shift(data > 9, (x, y)) for x in range(-1, 2) for y in range(-1, 2)]).sum(axis=0)
-    mask = np.logical_or(data[window] > 9, data[window] == 0)
-    data[window] += adjacents * (~mask)
-    data[window][mask] = 0
+    mask = np.logical_or(data[WINDOW] > 9, data[WINDOW] == 0)
+    data[WINDOW] += adjacents * (~mask)
+    data[WINDOW][mask] = 0
     return data
 
 
 def calculate_step(data):
-    data[window] += 1
+    data[WINDOW] += 1
     while True:
         new = flash(np.copy(data))
         if np.array_equal(new, data):
@@ -49,10 +49,10 @@ round_2 = dataset_parametrization("2021", "11", [("", 195)], result=235, dataset
 def test_part_one(dataset: DataSet):
     data = dataset.get_data()
     result = 0
-    for _ in range(num_steps):
+    for _ in range(NUM_STEPS):
         calculate_step(data)
         # noinspection PyUnresolvedReferences
-        result += (data[window] == 0).sum()
+        result += (data[WINDOW] == 0).sum()
     assert result == dataset.result
 
 
@@ -60,7 +60,7 @@ def test_part_one(dataset: DataSet):
 def test_part_two(dataset: DataSet):
     data = dataset.get_data()
     counter = 0
-    while data[window].sum() > 0:
+    while data[WINDOW].sum() > 0:
         calculate_step(data)
         counter += 1
     assert counter == dataset.result

@@ -11,7 +11,7 @@ import pytest
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
-overlap_threshold = 12
+OVERLAP_THRESHOLD = 12
 rotations = np.array(
     [[[1, 0, 0], [0, 1, 0], [0, 0, 1]], [[0, -1, 0], [1, 0, 0], [0, 0, 1]], [[-1, 0, 0], [0, -1, 0], [0, 0, 1]],
      [[0, 1, 0], [-1, 0, 0], [0, 0, 1]], [[0, 0, 1], [0, 1, 0], [-1, 0, 0]], [[0, 0, 1], [1, 0, 0], [0, 1, 0]],
@@ -44,7 +44,7 @@ def get_matching_beacon_candidates(distances_0, distances_1):
 
 def align(reports, distances, index_0, index_1):
     candidates = get_matching_beacon_candidates(distances[index_0], distances[index_1])
-    if len(candidates) >= math.comb(overlap_threshold, 2):
+    if len(candidates) >= math.comb(OVERLAP_THRESHOLD, 2):
         for candidate in candidates:
             x1, x2, y1, y2, r = reports[index_0][candidate[0]], reports[index_0][candidate[1]], \
                 reports[index_1][candidate[2]], reports[index_1][candidate[3]], None
@@ -53,7 +53,7 @@ def align(reports, distances, index_0, index_1):
                     break
             transformed = np.dot(r, (reports[index_1] - y1).transpose()).transpose() + x1
             # noinspection PyUnresolvedReferences
-            if (reports[index_0][:, None] == transformed).all(-1).any(-1).sum() >= overlap_threshold:
+            if (reports[index_0][:, None] == transformed).all(-1).any(-1).sum() >= OVERLAP_THRESHOLD:
                 scanner_pos = np.dot(r, -y1) + x1
                 reports[index_1][:] = transformed
                 return True, scanner_pos

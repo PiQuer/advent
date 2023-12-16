@@ -44,7 +44,7 @@ def trajectory_hit(px, py, data):
 @pytest.mark.parametrize(**round_2)
 def test_part_two(dataset: DataSet):
     data = dataset.get_data()
-    x1, x2, y1, y2 = data
+    x1, x2, y1, _ = data
     px_min = math.ceil(-1/2 + math.sqrt((1/2)**2 + 2*x1))
     px_max = x2
     py_max = -y1-1

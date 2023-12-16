@@ -48,7 +48,7 @@ def next_step(pq: list, start: ta.array, target: ta.array, board: np.array, seen
     item: Item = heapq.heappop(pq)
     if shortest and item.step + sum(ta.abs(target - item.pos)) >= shortest:
         return shortest
-    elif item.distance == 1:
+    if item.distance == 1:
         return item.step + 1
     for next_pos in chain(filter(partial(inbounds, board.shape), ta_adjacent(item.pos)), (item.pos,)):
         if (next_item := Item(pos=next_pos, step=item.step + 1, target=target)) not in seen:

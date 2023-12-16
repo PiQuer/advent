@@ -10,12 +10,12 @@ import pytest
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
-year="2023"
-day="14"
+YEAR= "2023"
+DAY= "14"
 
 
-round_1 = dataset_parametrization(year=year, day=day, examples=[("", 136)], result=109385, dataset_class=DataSetBase)
-round_2 = dataset_parametrization(year=year, day=day, examples=[("", 64)], result=93102, dataset_class=DataSetBase)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 136)], result=109385, dataset_class=DataSetBase)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 64)], result=93102, dataset_class=DataSetBase)
 
 @cache
 def roll_col(col: tuple[bytes, ...]) -> bytearray:

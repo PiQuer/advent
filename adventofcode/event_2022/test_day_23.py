@@ -41,7 +41,7 @@ def visualize(board: set[ta.array], b_min: Optional[ta.array] = None):
 
 
 def neighbors(pos: ta.array, board: set[ta.array]) -> dict[str, int]:
-    return {n: sum(1 for d in neighbor_directions[n] if (pos + d) in board) for n in neighbor_directions}
+    return {n: sum(1 for d in v if pos + d in board) for n, v in neighbor_directions.items()}
 
 
 class DataSet(DataSetBase):
@@ -59,7 +59,7 @@ def move(board: set[ta.array], try_list: deque[ta.array]) -> bool:
     for elf in board:
         nm = neighbors(elf, board)
         if 0 < quantify(nm.values()) < 4:
-            proposed_moves[elf + first(lstrip(try_list, lambda t: nm[t]))].append(elf)
+            proposed_moves[elf + first(lstrip(try_list, lambda t, m=nm: m[t]))].append(elf)
     for pm in (_ for _ in proposed_moves if len(proposed_moves[_]) == 1):
         board.remove(proposed_moves[pm][0])
         board.add(pm)
