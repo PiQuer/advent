@@ -81,27 +81,27 @@ def adjacent_3d() -> Iterator[tuple[int, ...]]:
     return (a for a in adjacent_with_diag_3d() if sum(map(abs, a)) == 1)
 
 
-def np_grid() -> Iterator[np.array]:
+def np_grid() -> Iterator[np.ndarray]:
     return (np.array(a) for a in grid())
 
 
-def np_adjacent_with_diag() -> Iterator[np.array]:
+def np_adjacent_with_diag() -> Iterator[np.ndarray]:
     return (np.array(a) for a in adjacent_with_diag())
 
 
-def np_adjacent() -> Iterator[np.array]:
+def np_adjacent() -> Iterator[np.ndarray]:
     return (np.array(a) for a in adjacent())
 
 
-def ta_adjacent(pos: ta.array = ta.array((0, 0))) -> Iterator[ta.array]:
+def ta_adjacent(pos: ta.array = ta.array((0, 0))) -> Iterator[ta.ndarray_int]:
     return (pos + ta.array(a) for a in adjacent())
 
 
-def ta_adjacent_with_diag_3d() -> Iterator[ta.array]:
+def ta_adjacent_with_diag_3d() -> Iterator[ta.ndarray_int]:
     return map(ta.array, adjacent_with_diag_3d())
 
 
-def ta_adjacent_3d() -> Iterator[ta.array]:
+def ta_adjacent_3d() -> Iterator[ta.ndarray_int]:
     return map(ta.array, adjacent_3d())
 
 
@@ -109,22 +109,22 @@ def directions() -> dict[str, tuple[int, ...]]:
     return dict(zip(('l', 'u', 'd', 'r'), adjacent()))
 
 
-def np_directions() -> dict[str, np.array]:
+def np_directions() -> dict[str, np.ndarray]:
     return dict(zip(('l', 'u', 'd', 'r'), np_adjacent()))
 
 
-def ta_directions(chars=('l', 'u', 'd', 'r')) -> dict[str, ta.array]:
+def ta_directions(chars=('l', 'u', 'd', 'r')) -> dict[str, ta.ndarray_int]:
     return dict(zip(chars, ta_adjacent()))
 
 
-def ta_directions_arrows() -> dict[str, ta.array]:
+def ta_directions_arrows() -> dict[str, ta.ndarray_int]:
     return ta_directions(chars=('^', '<', '>', 'v'))
 
 
 @dataclass
 class Waypoint:
     length: Union[int, float]
-    previous: Optional[Union[tuple[int, int], ta.array]]
+    previous: Optional[Union[tuple[int, int], ta.ndarray_int]]
     value: Optional[Any] = None
 
 
@@ -136,11 +136,11 @@ def generate_rounds(round_1: dict, round_2: dict):
     return pytest_generate_tests_template
 
 
-def inbounds(shape: ta.array, pos: ta.array) -> bool:
+def inbounds(shape: ta.ndarray_int, pos: ta.ndarray_int) -> bool:
     return max(pos - shape) < 0 <= min(pos)
 
 
-def shift(array: np.array, amount=1, axis=0, fill=11):
+def shift(array: np.ndarray, amount=1, axis=0, fill=11):
     result = np.roll(np.copy(array), amount, axis=axis)
     index = [slice(None) for _ in result.shape]
     index[axis] = slice(min(np.sign(amount), 0), amount + min(np.sign(amount), 0), np.sign(amount))
