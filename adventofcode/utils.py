@@ -146,3 +146,7 @@ def shift(array: np.ndarray, amount=1, axis=0, fill=11):
     index[axis] = slice(min(np.sign(amount), 0), amount + min(np.sign(amount), 0), np.sign(amount))
     result[tuple(index)] = fill
     return result
+
+
+def cross_product(v1: ta.ndarray_int, v2: ta.ndarray_int) -> int:
+    return v1[0]*v2[1] - v1[1]*v2[0]

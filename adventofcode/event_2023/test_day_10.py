@@ -12,7 +12,7 @@ import pytest
 import tinyarray as ta
 from more_itertools import iterate, one
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, adjacent, inbounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, adjacent, inbounds, cross_product
 
 rotation = ta.array([[0, 1], [-1, 0]])
 
@@ -79,10 +79,6 @@ def test_round_1(dataset: DataSet):
             break
     else:
         assert False
-
-
-def cross_product(v1: ta.ndarray_int, v2: ta.ndarray_int):
-    return v1[0]*v2[1] - v1[1]*v2[0]
 
 
 @pytest.mark.parametrize(**round_2)

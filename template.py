@@ -6,7 +6,7 @@ import pytest
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
-# from utils import generate_rounds
+# from adventofcode.utils import generate_rounds
 
 YEAR= "2023"
 DAY= "00"
