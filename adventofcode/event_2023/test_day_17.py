@@ -3,17 +3,23 @@
 https://adventofcode.com/2023/day/17
 """
 import heapq
+import logging
 import math
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 import numpy as np
 import pytest
 import tinyarray as ta
 from more_itertools import only, one
+from ratelimitingfilter import RateLimitingFilter
 
-from utils import adjacent, inbounds, dataset_parametrization, DataSetBase
+from adventofcode.utils import adjacent, inbounds, dataset_parametrization, DataSetBase
+
+ratelimit = RateLimitingFilter(rate=1, per=2, match=["Candidate"])
+logging.root.addFilter(ratelimit)
+
 
 # from utils import generate_rounds
 
@@ -32,7 +38,6 @@ round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", None)], res
 class PathCoordinates:
     coordinates: ta.ndarray_int
     heading: ta.ndarray_int
-    distance: int = math.inf
 
 @dataclass(frozen=True)
 class PathState:
@@ -48,13 +53,12 @@ class PathState:
 
 @dataclass(frozen=True)
 class CrucibleWaypoint:
-    previous: Optional["CrucibleWaypoint"]
+    previous: Optional["CrucibleWaypoint"] = field(hash=False, compare=False)
     state: PathState
     this: PathCoordinates
 
     def __lt__(self, other: "CrucibleWaypoint"):
-        return self.this.distance < other.this.distance or \
-            (self.this.distance == other.this.distance and self.state.value < other.state.value)
+        return self.state.value < other.state.value
 
     def __str__(self):
         previous_coordinates = self.previous.this.coordinates if self.previous is not None else None
@@ -74,8 +78,8 @@ def visualize_path(data: np.ndarray, waypoint: CrucibleWaypoint):
 
 def get_best_paths(best_paths: defaultdict[PathCoordinates, set[CrucibleWaypoint]], data: np.ndarray,
                    candidates: list[CrucibleWaypoint], target_coordinates: PathCoordinates):
-    target_waypoint = only(best_paths[target_coordinates])
     candidate = heapq.heappop(candidates)
+    logging.debug("Candidates: %s, current: %s", len(candidates), candidate)
     neighbors = (PathCoordinates(next_coordinates, ta.array(h))
                  for h in adjacent() if ta.array(h) != -candidate.this.heading and
                  inbounds(data.shape, next_coordinates := candidate.this.coordinates + h))
@@ -86,15 +90,12 @@ def get_best_paths(best_paths: defaultdict[PathCoordinates, set[CrucibleWaypoint
             continue
         if neighbor.coordinates == target_coordinates.coordinates:
             next_straight_segments = 0
+            neighbor = PathCoordinates(neighbor.coordinates, ta.array((0, 0)))
         next_waypoint = \
             CrucibleWaypoint(previous=candidate,
                              state=PathState(value=candidate.state.value + data[*neighbor.coordinates],
                                              straight_segments=next_straight_segments),
                              this=neighbor)
-        if target_waypoint is not None and \
-                target_waypoint.state.value <= \
-                next_waypoint.state.value + sum(ta.abs(target_coordinates.coordinates - next_waypoint.this.coordinates)):
-            continue
         to_remove = set()
         competing = best_paths[neighbor if neighbor.coordinates != target_coordinates.coordinates else target_coordinates]
         for c in competing:
@@ -114,12 +115,14 @@ def test_round_1(dataset: DataSet):
     target_coordinates = PathCoordinates(heading=ta.array((0, 0)), coordinates=ta.array(data.shape) - (1, 1))
     initial_state = PathState(value=0, straight_segments=0)
     best_paths: defaultdict[PathCoordinates, set[CrucibleWaypoint]] = defaultdict(set)
-    best_paths[initial_coordinates] = {CrucibleWaypoint(previous=None, state=initial_state,
-                                                        this=initial_coordinates)}
-    candidates = list(best_paths[initial_coordinates])
+    initial_waypoint = CrucibleWaypoint(previous=None, state=initial_state, this=initial_coordinates)
+    best_paths[initial_coordinates] = {initial_waypoint}
+    candidates = [initial_waypoint]
     while candidates:
         get_best_paths(best_paths, data, candidates, target_coordinates)
-    assert one(best_paths[target_coordinates]).state.value == dataset.result
+    result = one(best_paths[target_coordinates])
+    logging.info("Result: %s", result)
+    assert result.state.value == dataset.result
 
 
 @pytest.mark.parametrize(**round_2)
