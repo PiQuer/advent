@@ -5,14 +5,13 @@ https://adventofcode.com/2023/day/19
 import operator
 import re
 from collections.abc import Callable
-from dataclasses import dataclass
-from functools import partial
+from dataclasses import dataclass, field
+from functools import partial, reduce
 
 import pytest
+import tinyarray as ta
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
-
-# from adventofcode.utils import generate_rounds
 
 YEAR= "2023"
 DAY= "19"
@@ -41,6 +40,19 @@ class Rule:
         return None
 
 @dataclass
+class Constraint:
+    lower: list[int] = field(default_factory=lambda: [1]*4)
+    upper: list[int] = field(default_factory=lambda: [4001]*4)
+
+    def valid(self) -> bool:
+        return all(e > 0 for e in ta.array(self.upper) - ta.array(self.lower))
+
+    def combinations(self) -> int:
+        return reduce(operator.mul, ta.array(self.upper) - ta.array(self.lower), 1)
+
+INDEX = {"x": 0, "m": 1, "a": 2, "s": 3, None: None}
+
+@dataclass
 class Workflow:
     name: str
     rules: list[Rule]
@@ -57,14 +69,36 @@ class Workflow:
                         return workflows[next_workflow].rating(part, workflows)
         assert False
 
+    def combinations(self, constraint: Constraint, workflows: dict[str, "Workflow"]) -> int:
+        result = 0
+        for rule in self.rules:
+            idx = INDEX[rule.field]
+            next_constraint_true = Constraint(lower=constraint.lower.copy(), upper=constraint.upper.copy())
+            if rule.operator is operator.lt:
+                next_constraint_true.upper[idx] = min(next_constraint_true.upper[idx], rule.value)
+                constraint.lower[idx] = max(constraint.lower[idx], rule.value)
+            elif rule.operator is operator.gt:
+                next_constraint_true.lower[idx] = max(next_constraint_true.lower[idx], rule.value + 1)
+                constraint.upper[idx] = min(constraint.upper[idx], rule.value + 1)
+            if next_constraint_true.valid():
+                match rule.if_true:
+                    case 'A':
+                        result += next_constraint_true.combinations()
+                    case 'R':
+                        result += 0
+                    case next_workflow:
+                        result += workflows[next_workflow].combinations(constraint=next_constraint_true,
+                                                                        workflows=workflows)
+        return result
+
 class DataSet(DataSetBase):
     def parse_rule(self, instruction: str) -> Rule:
         if ':' in instruction:
             comparison, target = instruction.split(':')
-            field = comparison[0]
+            f = comparison[0]
             op = operator.lt if comparison[1] == "<" else operator.gt
             value = int(comparison[2:])
-            return Rule(field=field, operator=op, value=value, if_true=target)
+            return Rule(field=f, operator=op, value=value, if_true=target)
         return Rule(if_true=instruction)
 
     def parse_workflow(self, line: str) -> Workflow:
@@ -82,9 +116,8 @@ class DataSet(DataSetBase):
         return workflows, parts
 
 round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 19114)], result=425811, dataset_class=DataSet)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 167409079868000)], result=None,
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 167409079868000)], result=131796824371749,
                                   dataset_class=DataSet)
-# pytest_generate_tests = generate_rounds(round_1, round_2)
 
 
 @pytest.mark.parametrize(**round_1)
@@ -95,4 +128,5 @@ def test_round_1(dataset: DataSet):
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
-    assert dataset.result is None
+    workflows, _ = dataset.preprocess()
+    assert workflows['in'].combinations(Constraint(), workflows=workflows) == dataset.result
