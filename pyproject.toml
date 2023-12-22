@@ -24,6 +24,7 @@ pytest-pycharm = "^0.7.0"
 pytest-profiling = "^1.7.0"
 ratelimitingfilter = "^1.5"
 pylint = "^3.0.3"
+pyvis = "^0.3.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
