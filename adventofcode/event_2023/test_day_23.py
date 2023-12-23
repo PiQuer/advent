@@ -9,7 +9,7 @@ import networkx as nx
 import numpy as np
 import pytest
 import tinyarray as ta
-from more_itertools import first
+from more_itertools import first, one
 from networkx import is_directed_acyclic_graph
 
 from adventofcode.utils import dataset_parametrization, DataSetBase, ta_adjacent, inbounds
@@ -96,5 +96,7 @@ def test_round_1(dataset: DataSet):
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
     graph = dataset.get_graph().to_undirected()
-    simple_paths = nx.all_simple_paths(graph, dataset.start, dataset.target)
-    assert max(sum(graph.edges[*e]['weight'] for e in pairwise(s)) for s in simple_paths) == dataset.result
+    last_to_exit = one(graph[dataset.target].keys())
+    simple_paths = nx.all_simple_paths(graph, dataset.start, last_to_exit)
+    dist = max(sum(graph.edges[*e]['weight'] for e in pairwise(s)) for s in simple_paths)
+    assert dist + graph.edges[last_to_exit, dataset.target]['weight'] == dataset.result
