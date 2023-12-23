@@ -46,7 +46,7 @@ def neighbors(pos: ta.array, board: set[ta.array]) -> dict[str, int]:
 
 class DataSet(DataSetBase):
     def board(self) -> set[ta.array]:
-        return set(map(ta.array, np.argwhere(self.np_array_bytes() == b'#')))
+        return set(map(ta.array, np.argwhere(self.np_array_bytes == b'#')))
 
 
 round_1 = dataset_parametrization(year="2022", day="23", examples=[("1", 110)], result=4049, dataset_class=DataSet)

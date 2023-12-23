@@ -91,13 +91,13 @@ def propagate(start: Beam) -> int:
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetBase):
-    init({}, dataset.np_array_bytes())
+    init({}, dataset.np_array_bytes)
     assert propagate(Beam(ta.array((0, 0)), ta.array((0, 1)))) == dataset.result
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSetBase):
-    contraption_ = dataset.np_array_bytes()
+    contraption_ = dataset.np_array_bytes
     cache_ = {}
     starting_positions = \
         ((Beam(ta.array((p, 0)), ta.array((0, 1))) for p in range(contraption_.shape[0])),

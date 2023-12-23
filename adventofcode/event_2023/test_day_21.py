@@ -63,7 +63,7 @@ def fill_garden(starting_position: Coordinates) -> dict[Coordinates, int]:
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetBase):
-    data = dataset.np_array_bytes()
+    data = dataset.np_array_bytes
     garden = fill_garden(Coordinates((ta.array(data.shape) - (1, 1)) // 2, data))
     steps = dataset.result[0]
     assert quantify(v <= steps and v % 2 == steps % 2 for v in garden.values()) == dataset.result[1]
@@ -79,4 +79,4 @@ class Garden:
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSetBase):
-    garden = fill_garden(Coordinates(ta.array((0, 0)), dataset.np_array_bytes()))
+    garden = fill_garden(Coordinates(ta.array((0, 0)), dataset.np_array_bytes))

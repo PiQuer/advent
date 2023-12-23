@@ -18,7 +18,7 @@ from adventofcode.utils import dataset_parametrization, DataSetBase, ta_adjacent
 
 class DataSet(DataSetBase):
     def blizzard_map(self) -> np.array:
-        result = self.np_array_bytes()
+        result = self.np_array_bytes
         return result[1:-1, 1:-1]
 
 

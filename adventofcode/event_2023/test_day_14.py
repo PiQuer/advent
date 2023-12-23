@@ -43,14 +43,14 @@ def total_load(rocks: np.ndarray) -> int:
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetBase):
-    rocks = dataset.np_array_bytes()
+    rocks = dataset.np_array_bytes
     roll(rocks)
     assert total_load(rocks) == dataset.result
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSetBase):
-    rocks = dataset.np_array_bytes()
+    rocks = dataset.np_array_bytes
     seen = {(h := rocks.tobytes()): 0}
     cycle = [rocks.copy()]
     index = 0

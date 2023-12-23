@@ -64,7 +64,7 @@ def update_gear(a: np.array, index_iter: peekable, gears: defaultdict):
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetBase):
     result = 0
-    a = dataset.np_array_bytes()
+    a = dataset.np_array_bytes
     index_iter = peekable(np.ndindex(a.shape))
     while index_iter:
         result += get_number(a, index_iter)
@@ -73,7 +73,7 @@ def test_round_1(dataset: DataSetBase):
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSetBase):
-    a = dataset.np_array_bytes()
+    a = dataset.np_array_bytes
     index_iter = peekable(np.ndindex(a.shape))
     gears = defaultdict(set)
     while index_iter:

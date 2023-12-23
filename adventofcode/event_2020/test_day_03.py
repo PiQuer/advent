@@ -16,7 +16,7 @@ round_2 = dataset_parametrization(year="2020", day="03", examples=[("", 336)], r
 
 
 def slope(it, dataset: DataSetBase) -> int:
-    a = dataset.np_array_bytes()
+    a = dataset.np_array_bytes
     rows, cols = a.shape
     return reduce(
         mul, (np.sum(a[tuple(zip(*zip(range(0, rows, down), (x % cols for x in count(0, right)))))] == b'#')

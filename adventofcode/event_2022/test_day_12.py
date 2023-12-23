@@ -58,7 +58,7 @@ def path_finder(heightmap: ta.array, start: ta.array, target: ta.array) \
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetBase):
-    heightmap_np = dataset.np_array_bytes()
+    heightmap_np = dataset.np_array_bytes
     start = ta.array(one(zip(*np.where(heightmap_np == b'S'))))
     target = ta.array(one(zip(*np.where(heightmap_np == b'E'))))
     heightmap_np[tuple(start)] = b'a'
@@ -73,7 +73,7 @@ def test_round_1(dataset: DataSetBase):
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSetBase):
-    heightmap_np = dataset.np_array_bytes()
+    heightmap_np = dataset.np_array_bytes
     start_s = ta.array(one(zip(*np.where(heightmap_np == b'S'))))
     target = ta.array(one(zip(*np.where(heightmap_np == b'E'))))
     heightmap_np[tuple(start_s)] = b'a'

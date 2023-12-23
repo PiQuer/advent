@@ -11,13 +11,13 @@ from adventofcode.utils import dataset_parametrization, DataSetBase, generate_ro
 
 class DataSet(DataSetBase):
     def needs_expansion(self):
-        data = self.np_array_bytes()
+        data = self.np_array_bytes
         expand_columns = np.argwhere(np.all(data == b'.', axis=0))
         expand_rows = np.argwhere(np.all(data == b'.', axis=1))
         return expand_rows, expand_columns
 
     def galaxies(self, expansion: int) -> np.ndarray:
-        g = np.argwhere(self.np_array_bytes() == b'#')
+        g = np.argwhere(self.np_array_bytes == b'#')
         self._expand(g, expansion=expansion)
         return g
 

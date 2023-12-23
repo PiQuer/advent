@@ -1,5 +1,6 @@
 """Useful helpers."""
 from dataclasses import dataclass, field
+from functools import cached_property
 from itertools import product
 from pathlib import Path
 from typing import Sequence, Any, Union, Optional, Iterator
@@ -34,6 +35,7 @@ class DataSetBase:
     def np_array_digits(self) -> np.ndarray:
         return np.genfromtxt(self.input_file, dtype=int, delimiter=1)
 
+    @cached_property
     def np_array_bytes(self) -> np.ndarray:
         x = np.array(self.lines(), dtype=bytes)
         return x.view('S1').reshape((x.size, -1))
@@ -76,6 +78,9 @@ def adjacent_with_diag_3d() -> Iterator[tuple[int, ...]]:
 def adjacent() -> Iterator[tuple[int, ...]]:
     return (a for a in adjacent_with_diag() if abs(a[0]) != abs(a[1]))
 
+
+def ta_adjacent() -> Iterator[ta.ndarray_int]:
+    return (ta.array(a) for a in adjacent())
 
 def adjacent_3d() -> Iterator[tuple[int, ...]]:
     return (a for a in adjacent_with_diag_3d() if sum(map(abs, a)) == 1)

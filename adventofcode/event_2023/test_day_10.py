@@ -53,10 +53,10 @@ def advance(s: State, field: np.ndarray) -> "State":
 class DataSet(DataSetBase):
     @cached_property
     def field(self) -> np.ndarray:
-        return self.np_array_bytes()
+        return self.np_array_bytes
 
     def starting_positions(self) -> tuple[State, State]:
-        start_index = ta.array(np.argwhere(self.np_array_bytes() == b'S')[0])
+        start_index = ta.array(np.argwhere(self.np_array_bytes == b'S')[0])
         connected = list(candidate for a in adjacent() if inbounds(self.field.shape, (candidate := start_index - a))
                          and a in pipes[self.field[*candidate]])
         return State(pos=start_index, next_pos=connected[0], prev_pos=connected[1]), \
