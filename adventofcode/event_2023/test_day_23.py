@@ -2,9 +2,11 @@
 --- Day 23: A Long Walk ---
 https://adventofcode.com/2023/day/23
 """
-import math
+from functools import partial
 from itertools import pairwise
+from multiprocessing import Pool
 
+import igraph as ig
 import networkx as nx
 import numpy as np
 import pytest
@@ -37,36 +39,36 @@ class DataSet(DataSetBase):
         seen = {start}
         current = start
         steps = 0
-        while data[*current] not in (b'>', b'v') and current != self.target:
+        while data[(*current,)] not in (b'>', b'v') and current != self.target:
             steps += 1
             current = first(next_coordinates for h in ta_adjacent() if
                             (next_coordinates := current + h) not in seen and
                             inbounds(data.shape, next_coordinates) and
-                            (((sym := data[*next_coordinates]) not in (b'#', b'>', b'v')) or h == ALLOWED[sym]))
+                            (((sym := data[(*next_coordinates,)]) not in (b'#', b'>', b'v')) or h == ALLOWED[sym]))
             seen.add(current)
         if current == self.target:
             return current, steps
-        return current + ALLOWED[data[*current]], steps + 1
+        return current + ALLOWED[data[(*current,)]], steps + 1
 
     def get_graph(self) -> nx.DiGraph:
         result = nx.DiGraph()
         data = self.np_array_bytes
-        result.add_node(self.start)
+        result.add_node(str(self.start))
         backlog = {self.start}
         while backlog:
             if (current_node := backlog.pop()) == self.target:
                 continue
             if current_node == self.start:
                 next_node, steps = self.next_node(data, current_node)
-                result.add_edge(current_node, next_node, weight=steps)
+                result.add_edge(str(current_node), str(next_node), weight=steps)
                 backlog.add(next_node)
             else:
                 for h in (b'>', b'v'):
                     start = current_node + ALLOWED[h]
-                    if inbounds(data.shape, start) and data[*start] in (b'>', b'v'):
+                    if inbounds(data.shape, start) and data[(*start,)] != b'#':
                         start += ALLOWED[h]
                         next_node, steps = self.next_node(data, start)
-                        result.add_edge(current_node, next_node, weight=steps + 2)
+                        result.add_edge(str(current_node), str(next_node), weight=steps + 2)
                         backlog.add(next_node)
         return result
 
@@ -75,28 +77,30 @@ round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 94)], resul
 round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 154)], result=6258, dataset_class=DataSet)
 
 
-def single_source_longest_dag_path_length(graph: nx.DiGraph, s) -> dict[ta.ndarray_int, int]:
-    assert graph.in_degree(s) == 0
-    dist = dict.fromkeys(graph.nodes, -math.inf)
-    dist[s] = 0
-    topo_order = nx.topological_sort(graph)
-    for n in topo_order:
-        for source in graph.successors(n):
-            if dist[source] < dist[n] + graph.edges[n, source]['weight']:
-                dist[source] = dist[n] + graph.edges[n, source]['weight']
-    return dist
-
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSet):
     graph = dataset.get_graph()
     assert is_directed_acyclic_graph(graph)
-    dist = single_source_longest_dag_path_length(graph, ta.array((0, 1)))
-    assert dist[dataset.target] == dataset.result
+    assert nx.dag_longest_path_length(graph, weight="weight") == dataset.result
+
+
+def length(path, weights):
+    return sum(weights[e] for e in pairwise(path))
+
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
     graph = dataset.get_graph().to_undirected()
-    last_to_exit = one(graph[dataset.target].keys())
-    simple_paths = nx.all_simple_paths(graph, dataset.start, last_to_exit)
-    dist = max(sum(graph.edges[*e]['weight'] for e in pairwise(s)) for s in simple_paths)
-    assert dist + graph.edges[last_to_exit, dataset.target]['weight'] == dataset.result
+    last_to_exit = one(graph[str(dataset.target)].keys())
+    h = ig.Graph.from_networkx(graph)
+    h.vs["name"] = h.vs["_nx_name"]
+    weights = {}
+    for edge in h.es:
+        nodes = (edge.source, edge.target)
+        nodes_reversed = (edge.target, edge.source)
+        weights[nodes] = edge['weight']
+        weights[nodes_reversed] = edge['weight']
+    simple_paths = h.get_all_simple_paths(h.vs.find(str(dataset.start)), to=h.vs.find(last_to_exit))
+    with Pool(processes=None) as pool:
+        dist = max(pool.map(partial(length, weights=weights), simple_paths))
+    assert dist + graph.edges[last_to_exit, str(dataset.target)]['weight'] == dataset.result
