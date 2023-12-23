@@ -2,14 +2,16 @@
 --- Day 22: Sand Slabs ---
 https://adventofcode.com/2023/day/22
 """
+import heapq
 from collections import defaultdict
 from dataclasses import dataclass
+from functools import partial
 from itertools import repeat
 from operator import add
 
 import portion as P
 import pytest
-from more_itertools import quantify
+from more_itertools import quantify, first
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
@@ -32,17 +34,7 @@ class Brick:
         return Brick(x=self.x, y=self.y, z=P.closedopen(z, z + (self.z.upper - self.z.lower)))
 
     def __lt__(self, other: "Brick") -> bool:
-        if self.z.upper < other.z.upper:
-            return True
-        if self.z.upper > other.z.upper:
-            return False
-        return self.z.lower < other.z.lower
-
-    def sort_by_upper(self):
-        return (self.z.upper, self.z.lower)
-
-    def sort_by_lower(self):
-        return (self.z.lower, self.z.upper)
+        return self.z.upper < other.z.upper
 
 class DataSet(DataSetBase):
     def line_to_brick(self, line) -> Brick:
@@ -54,16 +46,17 @@ class DataSet(DataSetBase):
         return list(map(self.line_to_brick, self.lines()))
 
 round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 5)], result=421, dataset_class=DataSet)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 7)], result=None, dataset_class=DataSet)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 7)], result=39247, dataset_class=DataSet)
 
 
 def fall(bricks: list[Brick]):
-    bricks.sort(key=Brick.sort_by_upper)
+    bricks.sort()
     for i, brick in enumerate(bricks):
         if brick.z.lower == 1:
             continue
         fallen = brick
-        for other in bricks[i-1::-1]:
+        for j in range(i-1, -1, -1):
+            other = bricks[j]
             if other.z.upper < fallen.z.lower:
                 fallen = fallen.move_to_z(other.z.upper)
             if other.supports(fallen):
@@ -71,10 +64,9 @@ def fall(bricks: list[Brick]):
                 break
         else:
             bricks[i] = fallen.move_to_z(1)
-        bricks[:i+1] = sorted(bricks[:i+1], key=Brick.sort_by_upper)
+        bricks[j:i+1] = sorted(bricks[j:i+1])
 
 def get_supporters(bricks: list[Brick]) -> tuple[defaultdict[Brick, set[Brick]], defaultdict[Brick, set[Brick]]]:
-    bricks.sort(key=Brick.sort_by_upper)
     supports: defaultdict[Brick, set[Brick]] = defaultdict(set)
     supported_by: defaultdict[Brick, set[Brick]] = defaultdict(set)
     for i, brick in enumerate(reversed(bricks)):
@@ -96,6 +88,31 @@ def test_round_1(dataset: DataSet):
     assert result == dataset.result
 
 
+def get_falling(brick: Brick, supports, supported_by) -> int:
+    falling = {brick}
+    current_layer: set[Brick] = set()
+    candidates = [brick]
+    while candidates:
+        while candidates:
+            candidate = heapq.heappop(candidates)
+            if not current_layer or candidate.z.upper == first(current_layer).z.upper:
+                current_layer.add(candidate)
+            else:
+                heapq.heappush(candidates, candidate)
+                break
+        falling.update(current_layer)
+        seen = set()
+        for b in current_layer:
+            for k in supported_by[b]:
+                if (k not in seen) and (not supports[k] - falling):
+                    seen.add(k)
+                    heapq.heappush(candidates, k)
+        current_layer = set()
+    return len(falling) - 1
+
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
-    assert dataset.result is None
+    bricks = dataset.bricks()
+    fall(bricks)
+    supports, supported_by = get_supporters(bricks)
+    assert sum(map(partial(get_falling, supports=supports, supported_by=supported_by), bricks)) == dataset.result
