@@ -27,7 +27,7 @@ class HailTrajectory:
 class DataSet(DataSetBase):
     def trajectories(self):
         for line in self.lines():
-            pos_str, v_str = line.split(sep='@', maxsplit=2)
+            pos_str, v_str = line.split(sep='@', maxsplit=1)
             yield HailTrajectory(ta.array((*map(int, pos_str.split(',')),)), ta.array((*map(int, v_str.split(',')),)))
 
 round_1 = dataset_parametrization(
