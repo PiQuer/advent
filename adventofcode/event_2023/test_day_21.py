@@ -17,10 +17,7 @@ YEAR= "2023"
 DAY= "21"
 
 round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", (6, 16))], result=(64, 3617))
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", (6, 16)), ("", (10, 50)), ("", (50, 1594)),
-                                                                ("", (100, 6536)), ("", (500, 167004)),
-                                                                ("", (1000, 668697)), ("", (5000, 16733044))],
-                                  result=(26501365, None))
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[], result=(26501365, 596857397104703))
 
 @dataclass
 class Coordinates:
@@ -52,31 +49,50 @@ def next_step(step: int, tiles: set[Coordinates], seen: dict[Coordinates, int]) 
     return next_tiles
 
 @cache
-def fill_garden(starting_position: Coordinates) -> dict[Coordinates, int]:
+def fill_garden(starting_position: Coordinates, max_steps: int) -> tuple[int, int]:
+    if max_steps < 0:
+        return 0
     tiles = {starting_position}
     seen = {starting_position: 0}
-    step = 0
-    while tiles:
-        step += 1
+    step = 1
+    while tiles and step <= max_steps:
         tiles = next_step(step, tiles, seen)
-    return seen
+        step += 1
+    return quantify(v % 2 == max_steps % 2 for v in seen.values()), \
+        quantify(v <= max_steps-1 and v % 2 == (max_steps-1)%2 for v in seen.values())
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetBase):
     data = dataset.np_array_bytes
-    garden = fill_garden(Coordinates((ta.array(data.shape) - (1, 1)) // 2, data))
     steps = dataset.result[0]
-    assert quantify(v <= steps and v % 2 == steps % 2 for v in garden.values()) == dataset.result[1]
+    result, _ = fill_garden(Coordinates((ta.array(data.shape) - (1, 1)) // 2, data), max_steps=steps)
+    assert result == dataset.result[1]
 
-
-@dataclass
-class Garden:
-    base_coordinates: ta.ndarray_int
-    offset_north = ta.ndarray_int
-    offset_west = ta.ndarray_int
-    offset_south = ta.ndarray_int
-    offset_east = ta.ndarray_int
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSetBase):
-    garden = fill_garden(Coordinates(ta.array((0, 0)), dataset.np_array_bytes))
+    data = dataset.np_array_bytes
+    start = Coordinates((ta.array(data.shape) - (1, 1)) // 2, data)
+    steps, result = dataset.result
+    p = data.shape[0]
+    y = (steps - ((p - 1) // 2)) // p
+    count_odd, count_even = fill_garden(start, p-1)
+    nw_count_odd, nw_count_even = fill_garden(Coordinates(ta.array((0, 0)), data), max_steps=(p-1)//2-1)
+    sw_count_odd, sw_count_even = fill_garden(Coordinates(ta.array((p-1, 0)), data), max_steps=(p-1)//2-1)
+    ne_count_odd, ne_count_even = fill_garden(Coordinates(ta.array((0, p-1)), data), max_steps=(p-1)//2-1)
+    se_count_odd, se_count_even = fill_garden(Coordinates(ta.array((p-1, p-1)), data), max_steps=(p-1)//2-1)
+    if y % 2 == 0:
+        full_tiles_even = (y - 1) ** 2
+        full_tiles_odd = y ** 2
+        count = full_tiles_even * count_even + full_tiles_odd * count_odd \
+            + y * (nw_count_odd + sw_count_odd + ne_count_odd + se_count_odd) \
+            + (y-1) * (4*count_even - nw_count_even - sw_count_even - ne_count_even - se_count_even) \
+            + 4*count_even - 2*(nw_count_even + sw_count_even + ne_count_even + se_count_even)
+    else:
+        full_tiles_even = y ** 2
+        full_tiles_odd = (y-1) ** 2
+        count = full_tiles_even * count_even + full_tiles_odd * count_odd \
+                + y * (nw_count_even + sw_count_even + ne_count_even + se_count_even) \
+                + (y - 1) * (4 * count_odd - nw_count_odd - sw_count_odd - ne_count_odd - se_count_odd) \
+                + 4 * count_odd - 2 * (nw_count_odd + sw_count_odd + ne_count_odd + se_count_odd)
+    assert count == result
