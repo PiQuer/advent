@@ -20,6 +20,7 @@ sortedcontainers = "^2.4.0"
 primefac = "^2.0.12"
 portion = "^2.4.2"
 python-igraph = "^0.11.3"
+sympy = "^1.12"
 
 [tool.poetry.group.dev.dependencies]
 pytest-pycharm = "^0.7.0"

@@ -153,5 +153,11 @@ def shift(array: np.ndarray, amount=1, axis=0, fill=11):
     return result
 
 
-def cross_product(v1: ta.ndarray_int, v2: ta.ndarray_int) -> int:
-    return v1[0]*v2[1] - v1[1]*v2[0]
+def cross_product(v1: ta.ndarray_int, v2: ta.ndarray_int) -> int | ta.ndarray_int:
+    if len(v1) == len(v2) == 2:
+        return v1[0]*v2[1] - v1[1]*v2[0]
+    if len(v1) == len(v2) == 3:
+        return ta.array(( v1[1]*v2[2] - v1[2]*v2[1],
+                         -v1[0]*v2[2] + v1[2]*v2[0],
+                          v1[0]*v2[1] - v1[1]*v2[0]))
+    raise NotImplementedError("Only 2d/3d vectors are supported.")
