@@ -11,6 +11,7 @@ import numpy as np
 import pytest
 import tinyarray as ta
 from more_itertools import quantify, consume
+import matplotlib.pyplot as plt
 
 from adventofcode.utils import dataset_parametrization, DataSetBase
 
@@ -36,13 +37,11 @@ class HailTrajectory:
             return -t
         return None
 
-    def intersect(self, other: "HailTrajectory") -> float | None:
-        t = np.linalg.norm(self.pos - other.pos) / np.linalg.norm(other.v - self.v)
-        if np.allclose(t * np.array(self.v, dtype=np.float64) + np.array(self.pos, dtype=np.float64),
-                  t * np.array(other.v, dtype=np.float64) + np.array(other.pos, dtype=np.float64)):
+    def intersect(self, other: "HailTrajectory") -> int | None:
+        t = round(np.linalg.norm(self.pos - other.pos) / np.linalg.norm(other.v - self.v))
+        if t * self.v + self.pos == t * other.v + other.pos:
             return t
-        if np.allclose(-t * np.array(self.v, dtype=np.float64) + np.array(self.pos, dtype=np.float64),
-                  -t * np.array(other.v, dtype=np.float64) + np.array(other.pos, dtype=np.float64)):
+        if -t * self.v + self.pos == -t * other.v + other.pos:
             return -t
         return None
 
@@ -55,7 +54,7 @@ class DataSet(DataSetBase):
 
 round_1 = dataset_parametrization(
     year=YEAR, day=DAY, examples=[("", (7, 27, 2))], result=(2*10**14, 4*10**14, 15107), dataset_class=DataSet)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[], result=856642398545208, dataset_class=DataSet)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[], result=856642398547748, dataset_class=DataSet)
 
 
 def intersect_x_y(h1: HailTrajectory, h2: HailTrajectory) -> np.ndarray | None:
@@ -76,7 +75,7 @@ def intersect_2d_testarea(h1: HailTrajectory, h2: HailTrajectory, minimum: int, 
             return minimum <= pos[0] <= maximum and minimum <= pos[1] <= maximum
         return False
     # Trajectories are parallel, but could still have common points inside the test area
-    # do a few tests to rule out the edge condition of the paths being equal or having zero velocity
+    # run a few tests to rule out the edge condition of the paths being equal or having zero velocity
     assert h1.v[0] != 0 or h1.v[1] != 0
     idx = 0 if h1.v[0] != 0 else 1
     t = (h2.pos - h1.pos)[idx] / h1.v[idx]
@@ -98,11 +97,11 @@ def validate(stone_trajectory: HailTrajectory, dataset: DataSet) -> bool:
     return True
 
 
-def plot(trajectories: set[HailTrajectory], stone: HailTrajectory):
-    import matplotlib.pyplot as plt
+def plot(trajectories: list[HailTrajectory], stone: HailTrajectory):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    tmax = max(map(stone.intersect, trajectories))
+    sorted_list = sorted(enumerate(trajectories), key=lambda x: stone.intersect(x[1]))
+    tmax = stone.intersect(sorted_list[-1][1])
     for trajectory in trajectories:
         t_start = trajectory.position_at_time(0) / 10**14
         t_end = trajectory.position_at_time(tmax) / 10**14
@@ -121,14 +120,23 @@ def four_points(dataset: DataSet, *args):
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
     trajectories = list(dataset.trajectories())
-    four_points(dataset, *(0, 1, 2, 3))
-    a = ta.array((386070420374239.1, 249140435425791.9, 215101388198216.3))
-    b = ta.array((370019511484545.1, 251239400434818.9, 226275290156335.44))
-    t1 = trajectories[3].time_at_position(a)
-    t2 = trajectories[2].time_at_position(b)
-    v = (b-a) / (t2 - t1)
-    p0 = a - t1 * v
-    stone = HailTrajectory(ta.array(np.round(p0).astype(np.int64)), ta.array(np.round(v).astype(np.int64)))
+    # pre-selected four trajectories with intersections at t_min, t_max and at 1/3 and 2/3 of the total time span
+    indices = (20, 243, 35, 143)
+    four_points(dataset, *indices)
+    # plug into https://www.geogebra.org/classic/ujdr69zh and find a line which intersects all four trajectories.
+    # In fact there are two such lines, we need to make an educated guess which one is correct.
+    # TODO: include all the math here so that no manual step is needed
+    a = ta.array((323363294336316.6, 257340598061519.7, 258755195170768.16))
+    b = ta.array((268359865113756.6, 264533354190626.06, 297046043975703.94))
+    # get rid of rounding errors
+    t1 = round(trajectories[indices[-1]].time_at_position(a))
+    t2 = round(trajectories[indices[0]].time_at_position(b))
+    a_int = trajectories[indices[-1]].position_at_time(t1)
+    b_int = trajectories[indices[0]].position_at_time(t2)
+    v = (b_int-a_int) // (t2 - t1)
+    p0 = a_int - t1 * v
+    assert p0 == b_int - t2 * v
+    stone = HailTrajectory(p0, v)
     # plot(set(trajectories), stone)
     assert validate(stone, dataset)
-    # assert dataset.result == np.sum(stone.pos)
+    assert dataset.result == sum(stone.pos)
