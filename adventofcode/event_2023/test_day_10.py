@@ -63,9 +63,9 @@ class DataSet(DataSetBase):
                State(pos=start_index, next_pos=connected[1], prev_pos=connected[0])
 
 
-round_1 = dataset_parametrization(year="2023", day="10", examples=[("1", 4), ("2", 8)], result=6927,
+round_1 = dataset_parametrization(year="2023", day="10", examples=[("1", 4), ("2", 8)], part=1,
                                   dataset_class=DataSet)
-round_2 = dataset_parametrization(year="2023", day="10", examples=[("3", 4), ("4", 8), ("5", 10)], result=467,
+round_2 = dataset_parametrization(year="2023", day="10", examples=[("3", 4), ("4", 8), ("5", 10)], part=2,
                                   dataset_class=DataSet)
 
 
@@ -75,7 +75,7 @@ def test_round_1(dataset: DataSet):
     for c in itertools.count(1):
         cursor1, cursor2 = advance(cursor1, dataset.field), advance(cursor2, dataset.field)
         if cursor1.pos == cursor2.pos:
-            assert c == dataset.result
+            dataset.assert_answer(c)
             break
     else:
         assert False
@@ -105,4 +105,4 @@ def test_round_2(dataset: DataSet):
             if (candidate := next_tile + a) not in inside_tiles and candidate not in loop:
                 inside_tiles.add(candidate)
                 to_examine.add(candidate)
-    assert len(inside_tiles) == dataset.result
+    dataset.assert_answer(len(inside_tiles))

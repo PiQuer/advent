@@ -45,8 +45,8 @@ class DataSet(DataSetBase):
     def bricks(self) -> list[Brick]:
         return list(map(self.line_to_brick, self.lines()))
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 5)], result=421, dataset_class=DataSet)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 7)], result=39247, dataset_class=DataSet)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 5)], dataset_class=DataSet, part=1)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 7)], dataset_class=DataSet, part=2)
 
 
 def fall(bricks: list[Brick]):
@@ -85,7 +85,7 @@ def test_round_1(dataset: DataSet):
     fall(bricks)
     supports, supported_by = get_supporters(bricks)
     result = quantify(all(supports[supported] - {brick} for supported in supported_by[brick]) for brick in bricks)
-    assert result == dataset.result
+    dataset.assert_answer(result)
 
 
 def get_falling(brick: Brick, supports, supported_by) -> int:
@@ -115,4 +115,4 @@ def test_round_2(dataset: DataSet):
     bricks = dataset.bricks()
     fall(bricks)
     supports, supported_by = get_supporters(bricks)
-    assert sum(map(partial(get_falling, supports=supports, supported_by=supported_by), bricks)) == dataset.result
+    dataset.assert_answer(sum(map(partial(get_falling, supports=supports, supported_by=supported_by), bricks)))

@@ -112,21 +112,20 @@ class DataSet(DataSetBase):
     def preprocess(self) -> tuple[dict[str, Workflow], list[Part]]:
         workflows_string, parts_string = self.separated_by_empty_line()
         workflows = {w.name: w for w in map(self.parse_workflow, workflows_string.split("\n"))}
-        parts = list(map(self.parse_part, parts_string.split("\n")))
+        parts = list(map(self.parse_part, parts_string.strip().split("\n")))
         return workflows, parts
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 19114)], result=425811, dataset_class=DataSet)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 167409079868000)], result=131796824371749,
-                                  dataset_class=DataSet)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 19114)], dataset_class=DataSet, part=1)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 167409079868000)], dataset_class=DataSet, part=2)
 
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSet):
     workflows, parts = dataset.preprocess()
-    assert sum(map(partial(workflows['in'].rating, workflows=workflows), parts)) == dataset.result
+    dataset.assert_answer(sum(map(partial(workflows['in'].rating, workflows=workflows), parts)))
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
     workflows, _ = dataset.preprocess()
-    assert workflows['in'].combinations(Constraint(), workflows=workflows) == dataset.result
+    dataset.assert_answer(workflows['in'].combinations(Constraint(), workflows=workflows))

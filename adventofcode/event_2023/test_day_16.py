@@ -17,8 +17,8 @@ from adventofcode.utils import dataset_parametrization, DataSetBase, inbounds
 YEAR="2023"
 DAY= "16"
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 46)], result=7728, dataset_class=DataSetBase)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 51)], result=8061, dataset_class=DataSetBase)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 46)], dataset_class=DataSetBase, part=1)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 51)], dataset_class=DataSetBase, part=2)
 
 CACHE = {}
 CONTRAPTION = np.array(())
@@ -92,7 +92,7 @@ def propagate(start: Beam) -> int:
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetBase):
     init({}, dataset.np_array_bytes)
-    assert propagate(Beam(ta.array((0, 0)), ta.array((0, 1)))) == dataset.result
+    dataset.assert_answer(propagate(Beam(ta.array((0, 0)), ta.array((0, 1)))))
 
 
 @pytest.mark.parametrize(**round_2)
@@ -106,7 +106,7 @@ def test_round_2(dataset: DataSetBase):
          (Beam(ta.array((contraption_.shape[0]-1, p)), ta.array((-1, 0))) for p in range(contraption_.shape[1])))
     if dataset.id.startswith("example"):
         init(cache_, contraption_)
-        assert max(map(propagate, chain.from_iterable(starting_positions))) == dataset.result
+        dataset.assert_answer(max(map(propagate, chain.from_iterable(starting_positions))))
     else:
         with Pool(processes=None, initializer=init, initargs=(cache_, contraption_)) as pool:
-            assert max(pool.map(propagate, chain.from_iterable(starting_positions))) == dataset.result
+            dataset.assert_answer(max(pool.map(propagate, chain.from_iterable(starting_positions))))

@@ -17,8 +17,8 @@ class DataSet(DataSetBase):
             yield x.view('S1').reshape((x.size, -1))
 
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 405)], result=33780, dataset_class=DataSet)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 400)], result=23479, dataset_class=DataSet)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 405)], dataset_class=DataSet, part=1)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 400)], dataset_class=DataSet, part=2)
 
 
 def get_mirror_axis_horizontal(a: np.ndarray, smudge: bool = False) -> int | None:
@@ -48,9 +48,9 @@ def get_smudge_axis(a: np.ndarray) -> int:
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSet):
-    assert sum(map(get_mirror_axis, dataset.preprocess())) == dataset.result
+    dataset.assert_answer(sum(map(get_mirror_axis, dataset.preprocess())))
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
-    assert (sum(map(get_smudge_axis, dataset.preprocess()))) == dataset.result
+    dataset.assert_answer(sum(map(get_smudge_axis, dataset.preprocess())))

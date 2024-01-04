@@ -16,8 +16,8 @@ from adventofcode.utils import dataset_parametrization, DataSetBase, adjacent, i
 YEAR= "2023"
 DAY= "21"
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", (6, 16))], result=(64, 3617))
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[], result=(26501365, 596857397104703))
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 16, {'steps': 6})], steps=64, part=1)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[], steps=26501365, part=2)
 
 @dataclass
 class Coordinates:
@@ -61,19 +61,25 @@ def fill_garden(starting_position: Coordinates, max_steps: int) -> tuple[int, in
     return quantify(v % 2 == max_steps % 2 for v in seen.values()), \
         quantify(v <= max_steps-1 and v % 2 == (max_steps-1)%2 for v in seen.values())
 
+@pytest.fixture(autouse=True)
+def clear_caches():
+    fill_garden.cache_clear()
+    next_coordinates_good.cache_clear()
+
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetBase):
+    next_coordinates_good.cache_clear()
     data = dataset.np_array_bytes
-    steps = dataset.result[0]
+    steps = dataset.params['steps']
     result, _ = fill_garden(Coordinates((ta.array(data.shape) - (1, 1)) // 2, data), max_steps=steps)
-    assert result == dataset.result[1]
+    dataset.assert_answer(result)
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSetBase):
     data = dataset.np_array_bytes
     start = Coordinates((ta.array(data.shape) - (1, 1)) // 2, data)
-    steps, result = dataset.result
+    steps = dataset.params['steps']
     p = data.shape[0]
     y = (steps - ((p - 1) // 2)) // p
     count_odd, count_even = fill_garden(start, p-1)
@@ -95,4 +101,4 @@ def test_round_2(dataset: DataSetBase):
                 + y * (nw_count_even + sw_count_even + ne_count_even + se_count_even) \
                 + (y - 1) * (4 * count_odd - nw_count_odd - sw_count_odd - ne_count_odd - se_count_odd) \
                 + 4 * count_odd - 2 * (nw_count_odd + sw_count_odd + ne_count_odd + se_count_odd)
-    assert count == result
+    dataset.assert_answer(count)

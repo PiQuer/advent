@@ -34,11 +34,11 @@ class DataSet2(DataSetBase):
         return [Race(time, distance)]
 
 
-round_1 = dataset_parametrization(year="2023", day="06", examples=[("", 288)], result=741000,
+round_1 = dataset_parametrization(year="2023", day="06", examples=[("", 288)], part=1,
                                   dataset_class=DataSet1)
-round_2 = dataset_parametrization(year="2023", day="06", examples=[("", 71503)], result=38220708,
+round_2 = dataset_parametrization(year="2023", day="06", examples=[("", 71503)], part=2,
                                   dataset_class=DataSet2)
 pytest_generate_tests = generate_rounds(round_1, round_2)
 
 def test_day_6(dataset: DataSet1|DataSet2):
-    assert reduce(mul, (race.ways_to_win() for race in dataset.races())) == dataset.result
+    dataset.assert_answer(reduce(mul, (race.ways_to_win() for race in dataset.races())))

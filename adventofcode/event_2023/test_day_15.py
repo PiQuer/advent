@@ -12,8 +12,8 @@ from adventofcode.utils import dataset_parametrization, DataSetBase
 YEAR= "2023"
 DAY= "15"
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 1320)], result=507291, dataset_class=DataSetBase)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 145)], result=296921, dataset_class=DataSetBase)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 1320)], dataset_class=DataSetBase, part=1)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 145)], dataset_class=DataSetBase, part=2)
 
 
 def update(current: int, char: int) -> int:
@@ -24,6 +24,9 @@ def update(current: int, char: int) -> int:
 def calculate_hash(b: bytes) -> int:
     return reduce(update, bytearray(b), 0)
 
+@pytest.fixture(autouse=True)
+def clear_cache():
+    calculate_hash.cache_clear()
 
 @dataclass
 class Lens:
@@ -59,17 +62,17 @@ def focusing_power(box: Box) -> int:
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetBase):
-    assert sum(map(calculate_hash, dataset.bytes().split(b','))) == dataset.result
+    dataset.assert_answer(sum(map(calculate_hash, dataset.bytes().strip().split(b','))))
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSetBase):
     boxes = Boxes()
-    for lens_bytes in dataset.bytes().split(b','):
+    for lens_bytes in dataset.bytes().strip().split(b','):
         if lens_bytes.endswith(b'-'):
             label = lens_bytes[:-1]
             boxes[calculate_hash(label)].remove(label)
         else:
             lens = Lens(*lens_bytes.split(b'=', maxsplit=2))
             boxes[calculate_hash(lens.label)].replace(lens)
-    assert sum(map(focusing_power, boxes.values())) == dataset.result
+    dataset.assert_answer(sum(map(focusing_power, boxes.values())))

@@ -14,8 +14,8 @@ YEAR= "2023"
 DAY= "14"
 
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 136)], result=109385, dataset_class=DataSetBase)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 64)], result=93102, dataset_class=DataSetBase)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 136)], dataset_class=DataSetBase, part=1)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 64)], dataset_class=DataSetBase, part=2)
 
 @cache
 def roll_col(col: tuple[bytes, ...]) -> bytearray:
@@ -45,7 +45,7 @@ def total_load(rocks: np.ndarray) -> int:
 def test_round_1(dataset: DataSetBase):
     rocks = dataset.np_array_bytes
     roll(rocks)
-    assert total_load(rocks) == dataset.result
+    dataset.assert_answer(total_load(rocks))
 
 
 @pytest.mark.parametrize(**round_2)
@@ -63,4 +63,4 @@ def test_round_2(dataset: DataSetBase):
         seen[h] = index
         cycle.append(rocks.copy())
     final = cycle[(1000000000 - index) % (index - seen[h]) + seen[h]]
-    assert total_load(final) == dataset.result
+    dataset.assert_answer(total_load(final))

@@ -73,15 +73,15 @@ class DataSet(DataSetBase):
         return result
 
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 94)], result=2190, dataset_class=DataSet)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 154)], result=6258, dataset_class=DataSet)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 94)], dataset_class=DataSet, part=1)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 154)], dataset_class=DataSet, part=2)
 
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSet):
     graph = dataset.get_graph()
     assert is_directed_acyclic_graph(graph)
-    assert nx.dag_longest_path_length(graph, weight="weight") == dataset.result
+    dataset.assert_answer(nx.dag_longest_path_length(graph, weight="weight"))
 
 
 def length(path, weights):
@@ -103,4 +103,4 @@ def test_round_2(dataset: DataSet):
     simple_paths = h.get_all_simple_paths(h.vs.find(str(dataset.start)), to=h.vs.find(last_to_exit))
     with Pool(processes=None) as pool:
         dist = max(pool.map(partial(length, weights=weights), simple_paths))
-    assert dist + graph.edges[last_to_exit, str(dataset.target)]['weight'] == dataset.result
+    dataset.assert_answer(dist + graph.edges[last_to_exit, str(dataset.target)]['weight'])

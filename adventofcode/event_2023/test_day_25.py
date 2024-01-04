@@ -24,11 +24,11 @@ class DataSet(DataSetBase):
                 result.add_edge(key, value)
         return result
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 54)], result=614655, dataset_class=DataSet)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 54)], part=1, dataset_class=DataSet)
 
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSet):
     graph = dataset.build_graph()
     consume(starmap(graph.remove_edge, nx.minimum_edge_cut(graph)))
-    assert reduce(operator.mul, map(len, (nx.connected_components(graph))), 1) == dataset.result
+    dataset.assert_answer(reduce(operator.mul, map(len, (nx.connected_components(graph))), 1))

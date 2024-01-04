@@ -11,8 +11,8 @@ from more_itertools import peekable
 
 from adventofcode.utils import dataset_parametrization, DataSetBase, inbounds
 
-round_1 = dataset_parametrization(year="2023", day="03", examples=[("", 4361)], result=544433)
-round_2 = dataset_parametrization(year="2023", day="03", examples=[("", 467835)], result=76314915)
+round_1 = dataset_parametrization(year="2023", day="03", examples=[("", 4361)], part=1)
+round_2 = dataset_parametrization(year="2023", day="03", examples=[("", 467835)], part=2)
 
 
 def is_symbol(a: np.array, idx: ta.array, symbol: bytes = None) -> bool:
@@ -68,7 +68,7 @@ def test_round_1(dataset: DataSetBase):
     index_iter = peekable(np.ndindex(a.shape))
     while index_iter:
         result += get_number(a, index_iter)
-    assert result == dataset.result
+    dataset.assert_answer(result)
 
 
 @pytest.mark.parametrize(**round_2)
@@ -78,4 +78,4 @@ def test_round_2(dataset: DataSetBase):
     gears = defaultdict(set)
     while index_iter:
         update_gear(a, index_iter, gears)
-    assert sum(np.prod(list(v)) for k, v in gears.items() if len(v) == 2) == dataset.result
+    dataset.assert_answer(sum(np.prod(list(v)) for k, v in gears.items() if len(v) == 2))

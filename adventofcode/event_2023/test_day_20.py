@@ -96,9 +96,9 @@ class DataSet(DataSetBase):
                     result[d].register_input(m.name)
         return result
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("1", 32000000), ("2", 11687500)], result=873301506,
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("1", 32000000), ("2", 11687500)], part=1,
                                   dataset_class=DataSet)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[], result=241823802412393, dataset_class=DataSet)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[], part=2, dataset_class=DataSet)
 
 
 def push_the_button(modules: dict[str, Module]) -> ta.ndarray_int:
@@ -119,7 +119,7 @@ def test_round_1(dataset: DataSet):
     pulse_count = []
     for _ in range(target):
         pulse_count.append(push_the_button(modules))
-    assert operator.mul(*sum(pulse_count)) == dataset.result
+    dataset.assert_answer(operator.mul(*sum(pulse_count)))
 
 
 def create_graph(modules: dict[str, Module], pulse: Pulse):
@@ -165,4 +165,4 @@ def get_prime(b_str: str, modules: dict[str, Module]):
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
     modules = dataset.modules()
-    assert math.lcm(*map(partial(get_prime, modules=modules), modules['broadcaster'].destinations)) == dataset.result
+    dataset.assert_answer(math.lcm(*map(partial(get_prime, modules=modules), modules['broadcaster'].destinations)))

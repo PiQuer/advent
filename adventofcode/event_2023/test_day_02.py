@@ -47,16 +47,16 @@ class DataSet(DataSetBase):
 
 
 
-round_1 = dataset_parametrization(year="2023", day="02", examples=[("", 8)], result=2237, dataset_class=DataSet)
-round_2 = dataset_parametrization(year="2023", day="02", examples=[("", 2286)], result=66681, dataset_class=DataSet)
+round_1 = dataset_parametrization(year="2023", day="02", examples=[("", 8)], part=1, dataset_class=DataSet)
+round_2 = dataset_parametrization(year="2023", day="02", examples=[("", 2286)], part=2, dataset_class=DataSet)
 
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSet):
     bag = Subset(red=12, green=13, blue=14)
-    assert sum(game.id for game in dataset.preprocess() if all(g <= bag for g in game.subsets)) == dataset.result
+    dataset.assert_answer(sum(game.id for game in dataset.preprocess() if all(g <= bag for g in game.subsets)))
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
-    assert sum(game.min_subset().power() for game in dataset.preprocess()) == dataset.result
+    dataset.assert_answer(sum(game.min_subset().power() for game in dataset.preprocess()))

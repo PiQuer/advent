@@ -31,9 +31,9 @@ class DataSet(DataSetBase):
         yield from accumulate(self.directions(), lambda c, d: network[c][0] if d == "L" else network[c][1],
                               initial=start)
 
-round_1 = dataset_parametrization(year="2023", day="08", examples=[("1", 2), ("2", 6)], result=16343,
+round_1 = dataset_parametrization(year="2023", day="08", examples=[("1", 2), ("2", 6)], part=1,
                                   dataset_class=DataSet)
-round_2 = dataset_parametrization(year="2023", day="08", examples=[("3", 6)], result=15299095336639,
+round_2 = dataset_parametrization(year="2023", day="08", examples=[("3", 6)], part=2,
                                   dataset_class=DataSet)
 
 
@@ -46,7 +46,7 @@ def test_round_1(dataset: DataSet):
     while cursor != 'ZZZ':
         step, direction = next(directions)
         cursor = network[cursor][0] if direction == "L" else network[cursor][1]
-    assert step + 1 == dataset.result
+    dataset.assert_answer(step + 1)
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
@@ -58,4 +58,4 @@ def test_round_2(dataset: DataSet):
 
     factors = {len(dataset.lines()[0])}
     factors.update(chain.from_iterable(map(primefac, (map(cycle_length, dataset.start())))))
-    assert reduce(mul, factors) == dataset.result
+    dataset.assert_answer(reduce(mul, factors))

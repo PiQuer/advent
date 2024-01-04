@@ -73,17 +73,17 @@ class DataSetRound2(DataSetDay18):
         directive = line.split()[2]
         return list(HEADINGS.values())[int(directive[-2:-1])], int(directive[2:-2], 16)
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 62)], result=62500, dataset_class=DataSetRound1)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 952408144115)], result=122109860712709,
-                                  dataset_class=DataSetRound2)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 62)], dataset_class=DataSetRound1, part=1)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 952408144115)], dataset_class=DataSetRound2,
+                                  part=2)
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSetRound1):
     loop = dataset.loop()
-    assert loop.area() == dataset.result
+    dataset.assert_answer(loop.area())
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSetRound2):
     loop = dataset.loop()
-    assert loop.area() == dataset.result
+    dataset.assert_answer(loop.area())

@@ -25,10 +25,10 @@ DAY= "17"
 class DataSet(DataSetBase):
     pass
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 102)], result=870, dataset_class=DataSet,
-                                  initial_straight=1, max_straight=3)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 94)], result=1063, dataset_class=DataSet,
-                                  initial_straight=4, max_straight=10)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 102)], dataset_class=DataSet,
+                                  initial_straight=1, max_straight=3, part=1)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 94)], dataset_class=DataSet,
+                                  initial_straight=4, max_straight=10, part=2)
 pytest_generate_tests = generate_rounds(round_1, round_2)
 
 @dataclass(frozen=True)
@@ -126,4 +126,4 @@ def test_day_17(dataset: DataSet):
         get_best_paths(best_paths, data, candidates, target_coordinates, **dataset.params)
     result = one(best_paths[target_coordinates])
     logging.info("Result: %s", result)
-    assert result.state.value == dataset.result
+    dataset.assert_answer(result.state.value)

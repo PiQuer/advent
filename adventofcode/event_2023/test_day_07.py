@@ -61,13 +61,13 @@ class DataSet(DataSetBase):
         return [hand_class(cards, int(bid)) for cards, bid in map(lambda l: l.split(), self.lines())]
 
 
-round_1 = dataset_parametrization(year="2023", day="07", examples=[("", 6440)], result=250602641,
+round_1 = dataset_parametrization(year="2023", day="07", examples=[("", 6440)], part=1,
                                   dataset_class=DataSet, hand_class=Hand1)
-round_2 = dataset_parametrization(year="2023", day="07", examples=[("", 5905)], result=251037509,
+round_2 = dataset_parametrization(year="2023", day="07", examples=[("", 5905)], part=2,
                                   dataset_class=DataSet, hand_class=Hand2)
 pytest_generate_tests = generate_rounds(round_1, round_2)
 
 
 def test_day_7(dataset: DataSet):
-    assert sum(h.bid * (rank + 1) for rank, h in
-               enumerate(sorted(dataset.preprocessed(hand_class=dataset.params["hand_class"])))) == dataset.result
+    dataset.assert_answer(sum(h.bid * (rank + 1) for rank, h in
+                              enumerate(sorted(dataset.preprocessed(hand_class=dataset.params["hand_class"])))))

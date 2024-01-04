@@ -20,12 +20,12 @@ class DataSet(DataSetBase):
                     lines_function(self))
 
 
-round_1 = dataset_parametrization(year="2023", day="01", examples=[("1", 142)], result=55447, dataset_class=DataSet,
+round_1 = dataset_parametrization(year="2023", day="01", examples=[("1", 142)], part=1, dataset_class=DataSet,
                                   lines=DataSet.lines)
-round_2 = dataset_parametrization(year="2023", day="01", examples=[("2", 281)], result=54706, dataset_class=DataSet,
+round_2 = dataset_parametrization(year="2023", day="01", examples=[("2", 281)], part=2, dataset_class=DataSet,
                                   lines=DataSet.preprocessed_lines)
 pytest_generate_tests = generate_rounds(round_1, round_2)
 
 
 def test_day_1(dataset: DataSet):
-    assert sum(dataset.calibration_values(dataset.params["lines"])) == dataset.result
+    dataset.assert_answer(sum(dataset.calibration_values(dataset.params["lines"])))

@@ -5,9 +5,8 @@ https://adventofcode.com/2023/day/9
 from functools import cached_property
 
 import numpy as np
-import pytest
 
-from adventofcode.utils import dataset_parametrization, DataSetBase
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
 
 
 class DataSet(DataSetBase):
@@ -20,9 +19,11 @@ class DataSet(DataSetBase):
         return np.expand_dims(np.arange(self.data.shape[0]), axis=1)
 
 
-datasets = dataset_parametrization(year="2023", day="09", examples=[("", (114, 2))], result=(1806615041, 1211),
-                                   dataset_class=DataSet)
-
+part1 = dataset_parametrization(year="2023", day="09", examples=[("", 114, {'idx': 0})], part=1, dataset_class=DataSet,
+                                idx=0)
+part2 = dataset_parametrization(year="2023", day="09", examples=[("", 2, {'idx': 1})], part=2, dataset_class=DataSet,
+                                idx=1)
+pytest_generate_tests = generate_rounds(part1, part2)
 
 def poly_newton_coefficients(x, y):
     """
@@ -50,10 +51,9 @@ def newton_polynomial(x_data, a, x):
     return p
 
 
-@pytest.mark.parametrize(**datasets)
 def test_day_09(dataset: DataSet):
     x = np.array([[[dataset.x_data[-1, 0] + 1, -1]]])
     coefficients = poly_newton_coefficients(dataset.x_data, dataset.data)
     results = np.round(newton_polynomial(np.expand_dims(dataset.x_data, axis=2),
                                          np.expand_dims(coefficients, axis=2), x))
-    assert tuple(np.sum(results.astype(np.int32), axis=1).reshape(2,)) == dataset.result
+    dataset.assert_answer(np.sum(results.astype(np.int32), axis=1).reshape(2,)[dataset.params['idx']])

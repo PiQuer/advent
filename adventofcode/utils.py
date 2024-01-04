@@ -1,12 +1,18 @@
 """Useful helpers."""
+import logging
+import time
 from dataclasses import dataclass, field
 from functools import cached_property
 from itertools import product
 from pathlib import Path
 from typing import Sequence, Any, Union, Optional, Iterator
 
+import keyring
 import numpy as np
 import tinyarray as ta
+from aocd.models import User, Puzzle
+
+DEFAULT_RESULT = {'github': None, 'reddit': None, 'google': None}
 
 
 @dataclass
@@ -15,6 +21,32 @@ class DataSetBase:
     result: Any
     id: str
     params: dict[Any, Any] = field(default_factory=dict)
+    part: int|None = None
+    puzzle: Puzzle|None = None
+
+    def assert_answer(self, answer):
+        if self.result is None:
+            try:
+                match self.part:
+                    case 1:
+                        result = self.puzzle.answer_a
+                    case 2:
+                        result = self.puzzle.answer_b
+                    case _:
+                        assert False
+            except AttributeError:
+                time.sleep(1)
+                match self.part:
+                    case 1:
+                        self.puzzle.answer_a = answer
+                        time.sleep(1)
+                        result = self.puzzle.answer_a
+                    case 2:
+                        self.puzzle.answer_b = answer
+                        result = self.puzzle.answer_b
+        else:
+            result = str(self.result)
+        assert str(answer) == result
 
     def lines(self) -> list[str]:
         return self.input_file.read_text(encoding="ascii").splitlines()
@@ -44,9 +76,20 @@ class DataSetBase:
         return np.array([list(line) for line in self.lines()])
 
 
+def get_token(user: str) -> str:
+    token = keyring.get_password("aoc", user)
+    if token is None:
+        logging.error("The token for service 'aoc' user '%s' cannot be found in the keyring.", user)
+        logging.error("Add the credentials with 'keyring set aoc %s'", user)
+        raise ValueError(f"Username {user} not found in service 'aoc'.")
+    return token
+
+
 # noinspection PyArgumentList
-def dataset_parametrization(year: str, day: str, examples: Sequence[tuple[Any, ...]], result: Any,
-                            dataset_class: type[DataSetBase] = DataSetBase, **kwargs):
+def dataset_parametrization(year: str, day: str, examples: Sequence[tuple[Any, ...]], result: Any = None,
+                            dataset_class: type[DataSetBase] = DataSetBase, part: int|None = None,  **kwargs):
+    if result is None:
+        result = DEFAULT_RESULT
     current_dir = Path(__file__).parent
     base_dir = current_dir / f"event_{year}" / "input"
     examples = [dataset_class(
@@ -55,8 +98,17 @@ def dataset_parametrization(year: str, day: str, examples: Sequence[tuple[Any, .
         id=f"example{example[0]}",
         params=dict(kwargs, **(example[-1] if len(example) == 3 else {})))
         for example in examples]
-    puzzle = dataset_class(input_file=base_dir/f"day_{day}.txt", result=result, id="puzzle", params=kwargs)
-    return {'argnames': "dataset", 'argvalues': examples + [puzzle], 'ids': lambda x: x.id}
+    if isinstance(result, dict):
+        puzzle = []
+        for key, value in result.items():
+            user = User(token=get_token(key))
+            p = Puzzle(int(year), int(day), user=user)
+            assert p.input_data
+            puzzle.append(dataset_class(input_file=p.input_data_path, result=value, id=f"puzzle_for_{key}",
+                                        params=kwargs, part=part, puzzle=p))
+    else:
+        puzzle = [dataset_class(input_file=base_dir/f"day_{day}.txt", result=result, id="puzzle", params=kwargs)]
+    return {'argnames': "dataset", 'argvalues': examples + puzzle, 'ids': lambda x: x.id}
 
 
 def grid() -> Iterator[tuple[int, ...]]:
@@ -79,8 +131,8 @@ def adjacent() -> Iterator[tuple[int, ...]]:
     return (a for a in adjacent_with_diag() if abs(a[0]) != abs(a[1]))
 
 
-def ta_adjacent() -> Iterator[ta.ndarray_int]:
-    return (ta.array(a) for a in adjacent())
+def ta_adjacent(pos: ta.ndarray_int = ta.array((0, 0))) -> Iterator[ta.ndarray_int]:
+    return (pos + ta.array(a) for a in adjacent())
 
 def adjacent_3d() -> Iterator[tuple[int, ...]]:
     return (a for a in adjacent_with_diag_3d() if sum(map(abs, a)) == 1)
@@ -96,10 +148,6 @@ def np_adjacent_with_diag() -> Iterator[np.ndarray]:
 
 def np_adjacent() -> Iterator[np.ndarray]:
     return (np.array(a) for a in adjacent())
-
-
-def ta_adjacent(pos: ta.array = ta.array((0, 0))) -> Iterator[ta.ndarray_int]:
-    return (pos + ta.array(a) for a in adjacent())
 
 
 def ta_adjacent_with_diag_3d() -> Iterator[ta.ndarray_int]:

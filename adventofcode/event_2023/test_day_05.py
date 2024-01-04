@@ -85,7 +85,7 @@ class DataSet(DataSetBase):
         for block in blocks[1:]:
             names = re.match(r"(\S+)-to-(\S+) map:", block)
             map_from, map_to = names[1], names[2]
-            mappings = SortedList(line_to_mapping(line) for line in block.split('\n')[1:])
+            mappings = SortedList(line_to_mapping(line) for line in block.split('\n')[1:] if line)
             maps[map_from] = Map(map_from, map_to, mappings)
         return seeds, maps
 
@@ -93,9 +93,9 @@ class DataSet(DataSetBase):
         return hash(self.input_file)
 
 
-round_1 = dataset_parametrization(year="2023", day="05", examples=[("", 35)], result=88151870, dataset_class=DataSet,
+round_1 = dataset_parametrization(year="2023", day="05", examples=[("", 35)], part=1, dataset_class=DataSet,
                                   ranges=False)
-round_2 = dataset_parametrization(year="2023", day="05", examples=[("", 46)], result=2008785, dataset_class=DataSet,
+round_2 = dataset_parametrization(year="2023", day="05", examples=[("", 46)], part=2, dataset_class=DataSet,
                                   ranges=True)
 pytest_generate_tests = generate_rounds(round_1, round_2)
 
@@ -113,4 +113,4 @@ def test_day_5(dataset: DataSet):
             result = list(chain.from_iterable(mappings[category][s] for s in result))
             category = mappings[category].map_to
         return result
-    assert min(chain.from_iterable(map(map_to_end, seeds_ranges))).start == dataset.result
+    dataset.assert_answer(min(chain.from_iterable(map(map_to_end, seeds_ranges))).start)

@@ -66,20 +66,19 @@ class DataSet(DataSetBase):
         yield from (reduce('?'.join((con,)*5), tuple(map(int, cont.split(',')))*5)
                     for con, cont in map(lambda l: l.split(), self.lines()))
 
-round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 21)], result=7195, dataset_class=DataSet)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 525152)], result=33992866292225,
-                                  dataset_class=DataSet)
+round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 21)], dataset_class=DataSet, part=1)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 525152)], dataset_class=DataSet, part=2)
 
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSet):
-    assert sum(map(configurations, dataset.states())) == dataset.result
+    dataset.assert_answer(sum(map(configurations, dataset.states())))
 
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
     with multiprocessing.Pool() as pool:
-        assert sum(pool.map(configurations, dataset.folded_states())) == dataset.result
+        dataset.assert_answer(sum(pool.map(configurations, dataset.folded_states())))
 
 
 @pytest.mark.parametrize("con,cont,answer",

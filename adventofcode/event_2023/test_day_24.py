@@ -60,9 +60,10 @@ class DataSet(DataSetBase):
             yield Line3D(Point3D(trajectory.position_at_time(0)), Point3D(trajectory.position_at_time(1)))
 
 round_1 = dataset_parametrization(
-    year=YEAR, day=DAY, examples=[("", (7, 27, 2))], result=(2*10**14, 4*10**14, 15107), dataset_class=DataSet)
-round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 47)],
-                                  result=856642398547748, dataset_class=DataSet)
+    year=YEAR, day=DAY, examples=[("", 2, {'min': 7, 'max': 27})], min=2*10**14, max=4*10**14, dataset_class=DataSet,
+    part=1
+)
+round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 47)], dataset_class=DataSet, part=2)
 
 
 def intersect_x_y(h1: HailTrajectory, h2: HailTrajectory) -> np.ndarray | None:
@@ -85,9 +86,10 @@ def intersect_2d_test_area(h1: HailTrajectory, h2: HailTrajectory, minimum: int,
 
 @pytest.mark.parametrize(**round_1)
 def test_round_1(dataset: DataSet):
-    minimum, maximum, result = dataset.result
-    assert quantify(starmap(partial(intersect_2d_test_area, minimum=minimum, maximum=maximum),
-                            combinations(dataset.trajectories(), 2))) == result
+    minimum, maximum = dataset.params['min'], dataset.params['max']
+    dataset.assert_answer(
+        quantify(starmap(partial(intersect_2d_test_area, minimum=minimum, maximum=maximum),
+                         combinations(dataset.trajectories(), 2))))
 
 
 def intersecting_four_lines(line1: Line3D, line2: Line3D, line3: Line3D, line4: Line3D) -> set[Line3D]:
@@ -194,4 +196,4 @@ def get_stone_start_point(dataset: DataSet) -> Point3D:
 
 @pytest.mark.parametrize(**round_2)
 def test_round_2(dataset: DataSet):
-    assert sum(get_stone_start_point(dataset)) == dataset.result
+    dataset.assert_answer(sum(get_stone_start_point(dataset)))
