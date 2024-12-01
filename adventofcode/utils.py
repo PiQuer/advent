@@ -11,13 +11,14 @@ import keyring
 import numpy as np
 import tinyarray as ta
 from aocd.models import User, Puzzle
+from more_itertools import first
 
 DEFAULT_RESULT = {'github': None, 'reddit': None, 'google': None}
 
 
 @dataclass
 class DataSetBase:
-    input_file: Path
+    input_file: Path|str
     result: Any
     id: str
     params: dict[Any, Any] = field(default_factory=dict)
@@ -49,8 +50,9 @@ class DataSetBase:
         assert str(answer) == result
 
     def lines(self) -> list[str]:
+        if isinstance(self.input_file, str):
+            return self.input_file.splitlines()
         return self.input_file.read_text(encoding="ascii").splitlines()
-
 
     def text(self) -> str:
         return self.input_file.read_text(encoding="ascii")
@@ -62,7 +64,7 @@ class DataSetBase:
         return self.input_file.read_text(encoding="ascii").split("\n\n")
 
     def np_array(self, dtype=np.int32) -> np.array:
-        return np.loadtxt(self.input_file, dtype=dtype)
+        return np.loadtxt(self.lines(), dtype=dtype)
 
     def np_array_digits(self) -> np.ndarray:
         return np.genfromtxt(self.input_file, dtype=int, delimiter=1)
@@ -86,18 +88,29 @@ def get_token(user: str) -> str:
 
 
 # noinspection PyArgumentList
-def dataset_parametrization(year: str, day: str, examples: Sequence[tuple[Any, ...]], result: Any = None,
+def dataset_parametrization(year: str, day: str, examples: Sequence[tuple[Any, ...]] | None = None, result: Any = None,
+                            example_results: list|None = None,
                             dataset_class: type[DataSetBase] = DataSetBase, part: int|None = None,  **kwargs):
     if result is None:
         result = DEFAULT_RESULT
     current_dir = Path(__file__).parent
     base_dir = current_dir / f"event_{year}" / "input"
-    examples = [dataset_class(
-        input_file=base_dir/f"day_{day}_example{example[0]}.txt",
-        result=example[1],
-        id=f"example{example[0]}",
-        params=dict(kwargs, **(example[-1] if len(example) == 3 else {})))
-        for example in examples]
+    if examples is None:
+        examples = []
+        p = Puzzle(int(year), int(day), user=User(token=get_token(first(result.keys()))))
+        for id, example in enumerate(p.examples):
+            if example_results is None:
+                answer = example.answer_a if part == 1 else example.answer_b
+            else:
+                answer = example_results[id]
+            examples.append(dataset_class(input_file=example.input_data, result=answer, id=f"example{id}", part=part))
+    else:
+        examples = [dataset_class(
+            input_file=base_dir/f"day_{day}_example{example[0]}.txt",
+            result=example[1],
+            id=f"example{example[0]}",
+            params=dict(kwargs, **(example[-1] if len(example) == 3 else {})))
+            for example in examples]
     if isinstance(result, dict):
         puzzle = []
         for key, value in result.items():
