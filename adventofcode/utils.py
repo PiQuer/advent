@@ -103,7 +103,8 @@ def dataset_parametrization(year: str, day: str, examples: Sequence[tuple[Any, .
                 answer = example.answer_a if part == 1 else example.answer_b
             else:
                 answer = example_results[id]
-            examples.append(dataset_class(input_file=example.input_data, result=answer, id=f"example{id}", part=part))
+            examples.append(dataset_class(input_file=example.input_data, result=answer, id=f"example{id}", part=part,
+                                          puzzle=example))
     else:
         examples = [dataset_class(
             input_file=base_dir/f"day_{day}_example{example[0]}.txt",
