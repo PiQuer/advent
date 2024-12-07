@@ -162,6 +162,10 @@ def adjacent() -> Iterator[tuple[int, ...]]:
     return (a for a in adjacent_with_diag() if abs(a[0]) != abs(a[1]))
 
 
+def diag() -> Iterator[tuple[int, ...]]:
+    return (a for a in adjacent_with_diag() if abs(a[0]) == abs(a[1]))
+
+
 def ta_adjacent(pos: ta.ndarray_int = ta.array((0, 0))) -> Iterator[ta.ndarray_int]:
     return (pos + ta.array(a) for a in adjacent())
 
@@ -225,6 +229,8 @@ def inbounds(shape: ta.ndarray_int, pos: ta.ndarray_int) -> bool:
 
 
 def shift(array: np.ndarray, amount=1, axis=0, fill=11):
+    if amount == 0:
+        return array
     result = np.roll(np.copy(array), amount, axis=axis)
     index = [slice(None) for _ in result.shape]
     index[axis] = slice(min(np.sign(amount), 0), amount + min(np.sign(amount), 0), np.sign(amount))

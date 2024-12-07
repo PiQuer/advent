@@ -25,7 +25,6 @@ advent-of-code-data = "^2.0.1"
 keyring = "^24.3.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest-pycharm = "^0.7.0"
 pytest-profiling = "^1.7.0"
 ratelimitingfilter = "^1.5"
 pylint = "^3.0.3"
