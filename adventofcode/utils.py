@@ -25,7 +25,7 @@ class DataSetBase:
     part: int|None = None
     puzzle: Puzzle|None = None
 
-    def assert_answer(self, answer):
+    def assert_answer(self, answer, dryrun=False):
         if self.result is None:
             try:
                 match self.part:
@@ -39,29 +39,46 @@ class DataSetBase:
                 time.sleep(1)
                 match self.part:
                     case 1:
-                        self.puzzle.answer_a = answer
-                        time.sleep(1)
-                        result = self.puzzle.answer_a
+                        if dryrun:
+                            logging.warn("Would send answer % for part 1.", answer)
+                            result = None
+                        else:
+                            self.puzzle.answer_a = answer
+                            time.sleep(1)
+                            try:
+                                result = self.puzzle.answer_a
+                            except AttributeError:
+                                result = None
                     case 2:
-                        self.puzzle.answer_b = answer
-                        result = self.puzzle.answer_b
+                        if dryrun:
+                            logging.warn("Would send answer %d for part 2.", answer)
+                            result = None
+                        else:
+                            self.puzzle.answer_b = answer
+                            time.sleep(1)
+                            try:
+                                result = self.puzzle.answer_b
+                            except AttributeError:
+                                result = None
         else:
             result = str(self.result)
         assert str(answer) == result
 
     def lines(self) -> list[str]:
-        if isinstance(self.input_file, str):
-            return self.input_file.splitlines()
-        return self.input_file.read_text(encoding="ascii").splitlines()
+        return self.text().splitlines()
 
     def text(self) -> str:
+        if isinstance(self.input_file, str):
+            return self.input_file
         return self.input_file.read_text(encoding="ascii")
 
     def bytes(self) -> bytes:
+        if isinstance(self.input_file, str):
+            return self.input_file.encode(encoding='ascii')
         return self.input_file.read_bytes()
 
     def separated_by_empty_line(self) -> list[str]:
-        return self.input_file.read_text(encoding="ascii").split("\n\n")
+        return self.text().split("\n\n")
 
     def np_array(self, dtype=np.int32) -> np.array:
         return np.loadtxt(self.lines(), dtype=dtype)
