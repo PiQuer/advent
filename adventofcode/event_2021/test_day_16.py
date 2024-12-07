@@ -11,7 +11,7 @@ import bitarray.util as ba_util
 import numpy as np
 from bitarray import bitarray
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 class TypeID(Enum):
@@ -127,7 +127,7 @@ round_1 = dataset_parametrization(
 round_2 = dataset_parametrization(
     "2021", "16", [("_08", 3), ("_09", 54), ("_10", 7), ("_11", 9), ("_12", 1), ("_13", 0), ("_14", 0), ("_15", 1)],
     result=124921618408, fn=process)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_16(dataset: DataSetBase):

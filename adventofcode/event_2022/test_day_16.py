@@ -12,7 +12,7 @@ from typing import Optional
 import networkx as nx
 from more_itertools import padded, value_chain
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 @dataclass
@@ -149,7 +149,7 @@ round_1 = dataset_parametrization(year="2022", day="16", examples=[("", 1651)], 
                                   players=1, minutes=30)
 round_2 = dataset_parametrization(year="2022", day="16", examples=[("", 1707)], result=2191, dataset_class=DataSet,
                                   players=2, minutes=26)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_puzzle(dataset: DataSet):

@@ -6,7 +6,7 @@ import re
 
 from toolz import count
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 class DataSet(DataSetBase):
@@ -26,7 +26,7 @@ round_1 = dataset_parametrization("2015", "05", examples=[("1", 2)], result=236,
                                   fn=DataSet.nice_lines_1)
 round_2 = dataset_parametrization("2015", "05", examples=[("2", 2)], result=51, dataset_class=DataSet,
                                   fn=DataSet.nice_lines_2)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_05(dataset: DataSet):

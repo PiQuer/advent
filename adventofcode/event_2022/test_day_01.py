@@ -4,7 +4,7 @@ https://adventofcode.com/2022/day/1
 """
 import heapq
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 class DataSet(DataSetBase):
@@ -16,7 +16,7 @@ round_1 = dataset_parametrization(year="2022", day="01", examples=[("", 24000)],
                                   top=max)
 round_2 = dataset_parametrization(year="2022", day="01", examples=[("", 45000)], result=196804, dataset_class=DataSet,
                                   top=lambda x: sum(heapq.nlargest(3, x)))
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_1(dataset: DataSet):

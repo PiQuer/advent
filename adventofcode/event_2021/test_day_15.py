@@ -6,7 +6,7 @@ import logging
 
 import numpy as np
 
-from adventofcode.utils import Waypoint, dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import Waypoint, dataset_parametrization, DataSetBase, generate_parts
 
 
 def get_data_part_one(input_file):
@@ -50,7 +50,7 @@ def visualize_path(data, best_path):
 
 round_1 = dataset_parametrization("2021", "15", [("", 40)], result=583, get_data=get_data_part_one)
 round_2 = dataset_parametrization("2021", "15", [("", 315)], result=2927, get_data=get_data_part_two)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_15(dataset: DataSetBase):

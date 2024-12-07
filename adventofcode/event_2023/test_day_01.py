@@ -4,7 +4,7 @@ https://adventofcode.com/2023/day/1
 """
 import re
 
-from adventofcode.utils import DataSetBase, dataset_parametrization, generate_rounds
+from adventofcode.utils import DataSetBase, dataset_parametrization, generate_parts
 
 
 class DataSet(DataSetBase):
@@ -24,7 +24,7 @@ round_1 = dataset_parametrization(year="2023", day="01", examples=[("1", 142)], 
                                   lines=DataSet.lines)
 round_2 = dataset_parametrization(year="2023", day="01", examples=[("2", 281)], part=2, dataset_class=DataSet,
                                   lines=DataSet.preprocessed_lines)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_1(dataset: DataSet):

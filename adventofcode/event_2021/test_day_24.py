@@ -4,7 +4,7 @@ https://adventofcode.com/2021/day/24
 """
 import numpy as np
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 def char_to_index(a):
@@ -74,7 +74,7 @@ def process(input_data, prg):
 
 round_1 = dataset_parametrization("2021", "24", [], result=0, input_data=91297395919993)
 round_2 = dataset_parametrization("2021", "24", [], result=0, input_data=71131151917891)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_24(dataset: DataSetBase):

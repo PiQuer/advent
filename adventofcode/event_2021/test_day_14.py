@@ -4,7 +4,7 @@ https://adventofcode.com/2021/day/14
 """
 from collections import defaultdict
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 class DataSet(DataSetBase):
@@ -44,7 +44,7 @@ round_1 = dataset_parametrization("2021", "14", [("", 1588)], result=3048, datas
                                   steps=10)
 round_2 = dataset_parametrization("2021", "14", [("", 2188189693529)], result=3288891573057,
                                   dataset_class=DataSet, steps=40)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_14(dataset: DataSet):

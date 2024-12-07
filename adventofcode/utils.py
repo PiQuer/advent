@@ -216,11 +216,11 @@ class Waypoint:
     value: Optional[Any] = None
 
 
-def generate_rounds(round_1: dict, round_2: dict):
+def generate_parts(part_1: dict, part_2: dict):
     def pytest_generate_tests_template(metafunc):
         if "dataset" in metafunc.fixturenames:
-            metafunc.parametrize("dataset", argvalues=round_1['argvalues'] + round_2['argvalues'],
-                                 ids=lambda x: ("round1_" if x in round_1['argvalues'] else "round2_") + x.id)
+            metafunc.parametrize("dataset", argvalues=part_1['argvalues'] + part_2['argvalues'],
+                                 ids=lambda x: ("part1_" if x in part_1['argvalues'] else "part2_") + x.id)
     return pytest_generate_tests_template
 
 

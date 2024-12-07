@@ -17,7 +17,7 @@ import tinyarray as ta
 from more_itertools import quantify, first, iterate, always_reversible, rstrip, lstrip
 from toolz import complement, count
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 home_columns = {1: 3, 2: 5, 3: 7, 4: 9}
 hw_penalties = (1, 10, 100, 1000, 100, 10, 1)
@@ -241,7 +241,7 @@ round_1 = dataset_parametrization(year="2021", day="23",
                                   examples=[("", 12521)], result=12530, dataset_class=DataSet, depth=2)
 round_2 = dataset_parametrization(year="2021", day="23",
                                   examples=[("", 44169)], result=50492, dataset_class=DataSet, depth=4)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_23(dataset: DataSet):

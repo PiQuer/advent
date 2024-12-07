@@ -4,7 +4,7 @@ https://adventofcode.com/2019/day/1
 """
 from functools import partial
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 def calculate_fuel(mass: int, recursive: bool):
@@ -16,7 +16,7 @@ def calculate_fuel(mass: int, recursive: bool):
 
 round_1 = dataset_parametrization("2019", "01", [], result=3398090, recursive=False)
 round_2 = dataset_parametrization("2019", "01", [], result=5094261, recursive=True)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_01(dataset: DataSetBase):

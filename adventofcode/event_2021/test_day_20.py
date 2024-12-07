@@ -5,7 +5,7 @@ https://adventofcode.com/2021/day/20
 import numpy as np
 import tinyarray as ta
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 class DataSet(DataSetBase):
@@ -33,7 +33,7 @@ round_1 = dataset_parametrization("2021", "20", [("", 35)], result=5619, rounds=
                                   dataset_class=DataSet)
 round_2 = dataset_parametrization("2021", "20", [("", 3351)], result=20122, rounds=50,
                                   dataset_class=DataSet)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_20(dataset: DataSet):

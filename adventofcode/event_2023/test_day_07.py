@@ -6,7 +6,7 @@ from collections import Counter
 from dataclasses import dataclass
 from functools import cached_property
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 @dataclass
@@ -65,7 +65,7 @@ round_1 = dataset_parametrization(year="2023", day="07", examples=[("", 6440)], 
                                   dataset_class=DataSet, hand_class=Hand1)
 round_2 = dataset_parametrization(year="2023", day="07", examples=[("", 5905)], part=2,
                                   dataset_class=DataSet, hand_class=Hand2)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_7(dataset: DataSet):

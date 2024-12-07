@@ -6,7 +6,7 @@ from functools import cached_property
 
 import numpy as np
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 class DataSet(DataSetBase):
@@ -23,7 +23,7 @@ part1 = dataset_parametrization(year="2023", day="09", examples=[("", 114, {'idx
                                 idx=0)
 part2 = dataset_parametrization(year="2023", day="09", examples=[("", 2, {'idx': 1})], part=2, dataset_class=DataSet,
                                 idx=1)
-pytest_generate_tests = generate_rounds(part1, part2)
+pytest_generate_tests = generate_parts(part1, part2)
 
 def poly_newton_coefficients(x, y):
     """

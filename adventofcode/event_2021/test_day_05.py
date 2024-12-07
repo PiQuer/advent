@@ -5,7 +5,7 @@ https://adventofcode.com/2021/day/5
 import numpy as np
 from numpy.lib import recfunctions as rfn
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 class DataSet(DataSetBase):
@@ -26,7 +26,7 @@ round_1 = dataset_parametrization(year="2021", day="05", examples=[("", 5)], res
                                   dataset_class=DataSet)
 round_2 = dataset_parametrization(year="2021", day="05", examples=[("", 12)], result=22116, diagonals=True,
                                   dataset_class=DataSet)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_hydrovents(dataset: DataSet):

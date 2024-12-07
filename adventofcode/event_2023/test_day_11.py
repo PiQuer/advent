@@ -6,7 +6,7 @@ from itertools import combinations
 
 import numpy as np
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 class DataSet(DataSetBase):
@@ -30,7 +30,7 @@ round_1 = dataset_parametrization(year="2023", day="11", examples=[("", 374)], d
                                   expansion=2, part=1)
 round_2 = dataset_parametrization(year="2023", day="11", examples=[], dataset_class=DataSet,
                                   expansion=1000000, part=2)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 def test_day_11(dataset: DataSet):
     dataset.assert_answer(sum(np.sum(np.abs(a-b))

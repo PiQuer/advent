@@ -6,7 +6,7 @@ from itertools import repeat, accumulate
 
 import tinyarray as ta
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, ta_directions, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, ta_directions, generate_parts
 
 
 class DataSet(DataSetBase):
@@ -20,7 +20,7 @@ round_1 = dataset_parametrization(year="2022", day="09",
                                   examples=[("1", 13)], result=5513, dataset_class=DataSet, len=2)
 round_2 = dataset_parametrization(year="2022", day="09",
                                   examples=[("1", 1), ("2", 36)], result=2427, dataset_class=DataSet, len=10)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def update_pos(head: ta.array, tail: ta.array):

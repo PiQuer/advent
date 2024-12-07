@@ -13,7 +13,7 @@ import tinyarray as ta
 from more_itertools import one
 from ratelimitingfilter import RateLimitingFilter
 
-from adventofcode.utils import adjacent, inbounds, dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import adjacent, inbounds, dataset_parametrization, DataSetBase, generate_parts
 
 ratelimit = RateLimitingFilter(rate=1, per=2, match=["Candidate"])
 logging.root.addFilter(ratelimit)
@@ -29,7 +29,7 @@ round_1 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 102)], data
                                   initial_straight=1, max_straight=3, part=1)
 round_2 = dataset_parametrization(year=YEAR, day=DAY, examples=[("", 94)], dataset_class=DataSet,
                                   initial_straight=4, max_straight=10, part=2)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 @dataclass(frozen=True)
 class PathCoordinates:

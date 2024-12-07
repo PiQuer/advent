@@ -2,7 +2,7 @@
 --- Day 6: Tuning Trouble ---
 https://adventofcode.com/2022/day/6
 """
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 round_1 = dataset_parametrization(year="2022", day="06", examples=[("1", 7), ("2", 5), ("3", 6), ("4", 10), ("5", 11)],
@@ -10,7 +10,7 @@ round_1 = dataset_parametrization(year="2022", day="06", examples=[("1", 7), ("2
 round_2 = dataset_parametrization(year="2022", day="06",
                                   examples=[("1", 19), ("2", 23), ("3", 23), ("4", 29), ("5", 26)],
                                   result=2851, num_unique=14)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_6(dataset: DataSetBase):

@@ -11,7 +11,7 @@ import numpy as np
 import tinyarray as ta
 from more_itertools import always_reversible
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 @dataclass
@@ -37,7 +37,7 @@ rocks = (
 round_1 = dataset_parametrization(year="2022", day="17", examples=[("", 3068)], result=3137, rounds=2022)
 round_2 = dataset_parametrization(year="2022", day="17", examples=[("", 1_514_285_714_288)], result=1_564_705_882_327,
                                   rounds=1_000_000_000_000)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def visualize(c: np.array):

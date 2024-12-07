@@ -4,7 +4,7 @@ https://adventofcode.com/2022/day/2
 """
 from pathlib import Path
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 FILE_NAMES = {'example': Path("input/day_02_example.txt"), 'real': Path("input/day_02.txt")}
 
@@ -19,7 +19,7 @@ round_1 = dataset_parametrization(year="2022", day="02", examples=[("", 15)], re
                                   outcome=False)
 round_2 = dataset_parametrization(year="2022", day="02", examples=[("", 12)], result=14859, dataset_class=DataSet,
                                   outcome=True)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_2(dataset: DataSet):

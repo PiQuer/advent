@@ -10,7 +10,7 @@ from typing import Iterable, Callable, Any
 
 from more_itertools import partition
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 class Monkey:
@@ -102,7 +102,7 @@ round_1 = dataset_parametrization(year="2022", day="11",
 round_2 = dataset_parametrization(year="2022", day="11",
                                   examples=[("", 2713310158)], result=12848882750, dataset_class=DataSet2,
                                   rounds=10000)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_11(dataset: DataSet):

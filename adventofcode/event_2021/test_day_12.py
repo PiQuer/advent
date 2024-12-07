@@ -4,7 +4,7 @@ https://adventofcode.com/2021/day/12
 """
 from typing import Callable
 
-from adventofcode.utils import dataset_parametrization, DataSetBase, generate_rounds
+from adventofcode.utils import dataset_parametrization, DataSetBase, generate_parts
 
 
 class DataSet(DataSetBase):
@@ -67,7 +67,7 @@ round_1 = dataset_parametrization("2021", "12",
 round_2 = dataset_parametrization("2021", "12",
                                   [("_1", 36), ("_2", 103), ("_3", 3509)], result=122134,
                                   legal_path_fn=legal_path_part_two, dataset_class=DataSet)
-pytest_generate_tests = generate_rounds(round_1, round_2)
+pytest_generate_tests = generate_parts(round_1, round_2)
 
 
 def test_day_12(dataset: DataSet):
